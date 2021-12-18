@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["DecryptionError",""],["SessionCreationError",""]],"struct":[["ExportedSessionKey",""],["GroupSession",""],["InboundGroupSession",""],["SessionKey",""]]});
