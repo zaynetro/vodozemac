@@ -354,7 +354,7 @@
                 <span class="bool-val">false</span>
             };
 
-            <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">u32::from_le_bytes</span>(<span class="ident">index</span>);
+            <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">u32::from_be_bytes</span>(<span class="ident">index</span>);
             <span class="kw">let</span> <span class="ident">initial_ratchet</span> <span class="op">=</span> <span class="ident">Ratchet::from_bytes</span>(<span class="ident">ratchet</span>, <span class="ident">index</span>);
             <span class="kw">let</span> <span class="ident">latest_ratchet</span> <span class="op">=</span> <span class="ident">initial_ratchet</span>.<span class="ident">clone</span>();
 

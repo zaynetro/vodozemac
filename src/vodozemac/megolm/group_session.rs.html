@@ -159,7 +159,7 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">session_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SessionKey</span> {
-        <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ratchet</span>.<span class="ident">index</span>().<span class="ident">to_le_bytes</span>();
+        <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ratchet</span>.<span class="ident">index</span>().<span class="ident">to_be_bytes</span>();
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">export</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> [
             [<span class="ident">SESSION_KEY_VERSION</span>].<span class="ident">as_ref</span>(),
