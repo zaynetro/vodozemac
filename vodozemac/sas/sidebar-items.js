@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["SasError",""]],"struct":[["EstablishedSas",""],["Sas",""]]});
+initSidebarItems({"enum":[["SasError",""]],"struct":[["EstablishedSas",""],["Sas",""],["SasBytes",""]]});
