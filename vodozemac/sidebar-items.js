@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["Curve25519KeyError",""],["DecodeError",""],["LibolmUnpickleError",""]],"mod":[["megolm",""],["olm",""],["sas",""]],"struct":[["Curve25519PublicKey",""]]});
+initSidebarItems({"enum":[["Curve25519KeyError",""],["DecodeError",""],["LibolmUnpickleError",""]],"mod":[["megolm",""],["olm",""],["sas","User-friendly key verification using short authentication strings"]],"struct":[["Curve25519PublicKey",""]]});

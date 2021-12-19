@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["SasError",""]],"struct":[["EstablishedSas",""],["Sas",""],["SasBytes",""]]});
+initSidebarItems({"enum":[["SasError","Error type describing failures that can happen during the key verification."]],"struct":[["EstablishedSas","A struct representing a short auth string verification object where the shared secret has been established."],["Sas","A struct representing a short auth string verification object."],["SasBytes","Bytes generated from an shared secret that can be used as the short auth string."]]});
