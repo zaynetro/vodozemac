@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["OlmMessage",""]],"struct":[["Account","An Olm account manages all cryptographic keys used on a device."],["Session",""]]});
