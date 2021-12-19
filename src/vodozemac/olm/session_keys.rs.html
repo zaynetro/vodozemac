@@ -28,15 +28,6 @@
 <span id="26">26</span>
 <span id="27">27</span>
 <span id="28">28</span>
-<span id="29">29</span>
-<span id="30">30</span>
-<span id="31">31</span>
-<span id="32">32</span>
-<span id="33">33</span>
-<span id="34">34</span>
-<span id="35">35</span>
-<span id="36">36</span>
-<span id="37">37</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">// Copyright 2021 Damir Jelić, Denis Kasak</span>
 <span class="comment">//</span>
@@ -56,21 +47,12 @@
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Curve25519PublicKey</span>;
 
+<span class="doccomment">/// The set of keys that were used to establish the Olm Session,</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">SessionKeys</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">identity_key</span>: <span class="ident">Curve25519PublicKey</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">base_key</span>: <span class="ident">Curve25519PublicKey</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">one_time_key</span>: <span class="ident">Curve25519PublicKey</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">SessionKeys</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">identity_key</span>: <span class="ident">Curve25519PublicKey</span>,
-        <span class="ident">base_key</span>: <span class="ident">Curve25519PublicKey</span>,
-        <span class="ident">one_time_key</span>: <span class="ident">Curve25519PublicKey</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">identity_key</span>, <span class="ident">base_key</span>, <span class="ident">one_time_key</span> }
-    }
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type</span> <span class="ident">SessionKeysPickle</span> <span class="op">=</span> <span class="ident">SessionKeys</span>;
