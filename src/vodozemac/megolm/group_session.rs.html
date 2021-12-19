@@ -203,6 +203,28 @@
 <span id="201">201</span>
 <span id="202">202</span>
 <span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -216,6 +238,8 @@
 <span class="comment">// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="comment">// See the License for the specific language governing permissions and</span>
 <span class="comment">// limitations under the License.</span>
+
+<span class="kw">use</span> <span class="ident">std::ops::Deref</span>;
 
 <span class="kw">use</span> <span class="ident">ed25519_dalek</span>::{<span class="ident">ExpandedSecretKey</span>, <span class="ident">PublicKey</span>, <span class="ident">SecretKey</span>, <span class="ident">SignatureError</span>};
 <span class="kw">use</span> <span class="ident">rand::thread_rng</span>;
@@ -300,24 +324,19 @@
         <span class="ident">SessionKey</span>(<span class="ident">result</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pickle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">GroupSessionPickled</span> {
-        <span class="kw">let</span> <span class="ident">pickle</span>: <span class="ident">GroupSessionPickle</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">to_pickle</span>();
-        <span class="ident">GroupSessionPickled</span>(
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pickle_to_json_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">GroupSessionPickledJSON</span> {
+        <span class="kw">let</span> <span class="ident">pickle</span>: <span class="ident">GroupSessionPickle</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pickle</span>();
+        <span class="ident">GroupSessionPickledJSON</span>(
             <span class="ident">serde_json::to_string_pretty</span>(<span class="kw-2">&amp;</span><span class="ident">pickle</span>).<span class="ident">expect</span>(<span class="string">&quot;Group session serialization failed.&quot;</span>),
         )
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_pickle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">GroupSessionPickle</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pickle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">GroupSessionPickle</span> {
         <span class="ident">GroupSessionPickle</span> {
             <span class="ident">ratchet</span>: <span class="self">self</span>.<span class="ident">ratchet</span>.<span class="ident">clone</span>().<span class="ident">into</span>(),
             <span class="ident">signing_key</span>: (<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">signing_key</span>).<span class="ident">into</span>(),
             <span class="ident">public_key</span>: <span class="self">self</span>.<span class="ident">public_key</span>.<span class="ident">into</span>(),
         }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unpickle</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">GroupSessionUnpicklingError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">pickle</span>: <span class="ident">GroupSessionPickle</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="ident">input</span>)<span class="question-mark">?</span>;
-        <span class="ident">pickle</span>.<span class="ident">try_into</span>()
     }
 }
 
@@ -326,6 +345,12 @@
     <span class="ident">ratchet</span>: <span class="ident">RatchetPickle</span>,
     <span class="ident">signing_key</span>: <span class="ident">ExpandedSecretKeyPickle</span>,
     <span class="ident">public_key</span>: <span class="ident">PublicKeyPickle</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">GroupSessionPickle</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unpickle</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GroupSession</span>, <span class="ident">GroupSessionUnpicklingError</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">try_into</span>()
+    }
 }
 
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">GroupSessionPickle</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GroupSession</span> {
@@ -340,6 +365,35 @@
                 .<span class="ident">try_into</span>()
                 .<span class="ident">map_err</span>(<span class="ident">GroupSessionUnpicklingError::InvalidPublicKey</span>)<span class="question-mark">?</span>,
         })
+    }
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Zeroize</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">zeroize</span>(<span class="ident">drop</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GroupSessionPickledJSON</span>(<span class="ident">String</span>);
+
+<span class="kw">impl</span> <span class="ident">GroupSessionPickledJSON</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unpickle</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GroupSession</span>, <span class="ident">GroupSessionUnpicklingError</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">pickle</span>: <span class="ident">GroupSessionPickle</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
+        <span class="ident">pickle</span>.<span class="ident">unpickle</span>()
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GroupSessionPickledJSON</span> {
+    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
+        <span class="self">self</span>.<span class="ident">as_str</span>()
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">GroupSessionPickledJSON</span> {
+    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">str</span>;
+
+    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
+        <span class="self">self</span>.<span class="ident">as_ref</span>()
     }
 }
 
@@ -394,16 +448,6 @@
 
     <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">pickle</span>: <span class="ident">PublicKeyPickle</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="ident">PublicKey::from_bytes</span>(<span class="ident">pickle</span>.<span class="ident">key</span>.<span class="ident">as_slice</span>())
-    }
-}
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Zeroize</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">zeroize</span>(<span class="ident">drop</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GroupSessionPickled</span>(<span class="ident">String</span>);
-
-<span class="kw">impl</span> <span class="ident">GroupSessionPickled</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
     }
 }
 </code></pre></div>
