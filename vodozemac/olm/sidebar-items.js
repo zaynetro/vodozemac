@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["OlmMessage",""]],"struct":[["Account","An Olm account manages all cryptographic keys used on a device."],["Session",""]]});
+initSidebarItems({"enum":[["DecryptionError",""],["OlmMessage",""]],"struct":[["Account","An Olm account manages all cryptographic keys used on a device."],["Session","An Olm session represents one end of an encrypted communication channel between two participants."],["SessionPickledJSON",""]]});

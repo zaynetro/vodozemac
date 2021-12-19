@@ -391,7 +391,6 @@
 <span id="389">389</span>
 <span id="390">390</span>
 <span id="391">391</span>
-<span id="392">392</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Damir Jelić, Denis Kasak</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -406,16 +405,15 @@
 <span class="comment">// See the License for the specific language governing permissions and</span>
 <span class="comment">// limitations under the License.</span>
 
-<span class="doccomment">//! User-friendly key verification using short authentication strings</span>
+<span class="doccomment">//! User-friendly key verification using short authentication strings (SAS).</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! The verification process is heavily inspired by Phil Zimmermann’s [ZRTP] key</span>
-<span class="doccomment">//! agreement handshake. A key part of key agreement in [ZRTP] is the hash</span>
-<span class="doccomment">//! commitment: the party that begins the Diffie-Hellman key sharing sends a</span>
-<span class="doccomment">//! hash of their part of the Diffie-Hellman exchange, and does not send their</span>
-<span class="doccomment">//! part of the Diffie-Hellman exchange until they have received the other</span>
-<span class="doccomment">//! party’s part.</span>
+<span class="doccomment">//! The verification process is heavily inspired by Phil Zimmermann’s [ZRTP]</span>
+<span class="doccomment">//! key agreement handshake. A core part of key agreement in [ZRTP] is the</span>
+<span class="doccomment">//! *hash commitment*: the party that begins the key sharing process sends</span>
+<span class="doccomment">//! a *hash* of their part of the Diffie-Hellman exchange but does not send the</span>
+<span class="doccomment">//! part itself exchange until they had received the other party’s part.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! The verification process can be used to verify the ed25519 identity key of</span>
+<span class="doccomment">//! The verification process can be used to verify the Ed25519 identity key of</span>
 <span class="doccomment">//! an [`Account`].</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Examples</span>

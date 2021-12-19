@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["Curve25519KeyError",""],["DecodeError",""],["LibolmUnpickleError",""]],"mod":[["megolm",""],["olm",""],["sas","User-friendly key verification using short authentication strings"]],"struct":[["Curve25519PublicKey",""]]});
+initSidebarItems({"enum":[["Curve25519KeyError",""],["DecodeError",""],["LibolmUnpickleError",""]],"mod":[["megolm","An implementation of the Megolm ratchet."],["olm","An implementation of the Olm ratchet."],["sas","User-friendly key verification using short authentication strings (SAS)."]],"struct":[["Curve25519PublicKey",""]]});

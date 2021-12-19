@@ -24,6 +24,8 @@
 <span id="22">22</span>
 <span id="23">23</span>
 <span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">// Copyright 2021 Damir Jelić, Denis Kasak</span>
 <span class="comment">//</span>
@@ -39,6 +41,8 @@
 <span class="comment">// See the License for the specific language governing permissions and</span>
 <span class="comment">// limitations under the License.</span>
 
+<span class="doccomment">//! An implementation of the Olm ratchet.</span>
+
 <span class="kw">mod</span> <span class="ident">account</span>;
 <span class="kw">mod</span> <span class="ident">messages</span>;
 <span class="kw">mod</span> <span class="ident">session</span>;
@@ -47,7 +51,7 @@
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">account::Account</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">messages::OlmMessage</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">session::Session</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">session</span>::{<span class="ident">DecryptionError</span>, <span class="ident">Session</span>, <span class="ident">SessionPickledJSON</span>};
 </code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (91a0600a5 2021-12-18)" ></div>
 </body></html>

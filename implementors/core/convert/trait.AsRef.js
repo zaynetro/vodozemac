@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["vodozemac"] = [{"text":"impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html\" title=\"trait core::convert::AsRef\">AsRef</a>&lt;<a class=\"primitive\" href=\"https://doc.rust-lang.org/nightly/std/primitive.str.html\">str</a>&gt; for <a class=\"struct\" href=\"vodozemac/olm/struct.SessionPickledJSON.html\" title=\"struct vodozemac::olm::SessionPickledJSON\">SessionPickledJSON</a>","synthetic":false,"types":["vodozemac::olm::session::SessionPickledJSON"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
