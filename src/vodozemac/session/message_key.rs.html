@@ -105,6 +105,7 @@
 <span class="comment">// See the License for the specific language governing permissions and</span>
 <span class="comment">// limitations under the License.</span>
 
+<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">zeroize::Zeroize</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">ratchet::RatchetPublicKey</span>, <span class="ident">DecryptionError</span>};
@@ -113,7 +114,6 @@
     <span class="ident">messages::InnerMessage</span>,
 };
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Zeroize</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">MessageKey</span> {
     <span class="ident">key</span>: [<span class="ident">u8</span>; <span class="number">32</span>],
     <span class="ident">ratchet_key</span>: <span class="ident">RatchetPublicKey</span>,
@@ -126,7 +126,7 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Zeroize</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">RemoteMessageKey</span> {
     <span class="kw">pub</span> <span class="ident">key</span>: [<span class="ident">u8</span>; <span class="number">32</span>],
     <span class="kw">pub</span> <span class="ident">index</span>: <span class="ident">u64</span>,

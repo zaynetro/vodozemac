@@ -102,7 +102,17 @@
 <span id="100">100</span>
 <span id="101">101</span>
 <span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">hmac</span>::{<span class="ident">Hmac</span>, <span class="ident">Mac</span>};
+<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">sha2</span>::{<span class="ident">digest::CtOutput</span>, <span class="ident">Sha256</span>};
 <span class="kw">use</span> <span class="ident">zeroize::Zeroize</span>;
 
@@ -135,7 +145,7 @@
     <span class="ident">mac</span>.<span class="ident">finalize</span>()
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Zeroize</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Zeroize</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">ChainKey</span> {
     <span class="ident">key</span>: [<span class="ident">u8</span>; <span class="number">32</span>],
     <span class="ident">index</span>: <span class="ident">u64</span>,
@@ -147,7 +157,7 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Zeroize</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Zeroize</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">RemoteChainKey</span> {
     <span class="ident">key</span>: [<span class="ident">u8</span>; <span class="number">32</span>],
     <span class="ident">index</span>: <span class="ident">u64</span>,
@@ -166,6 +176,10 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">chain_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
         <span class="self">self</span>.<span class="ident">index</span>
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_bytes_and_index</span>(<span class="ident">bytes</span>: [<span class="ident">u8</span>; <span class="number">32</span>], <span class="ident">index</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> { <span class="ident">key</span>: <span class="ident">bytes</span>, <span class="ident">index</span>: <span class="ident">index</span>.<span class="ident">into</span>() }
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
@@ -187,6 +201,10 @@
 <span class="kw">impl</span> <span class="ident">ChainKey</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">bytes</span>: [<span class="ident">u8</span>; <span class="number">32</span>]) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">key</span>: <span class="ident">bytes</span>, <span class="ident">index</span>: <span class="number">0</span> }
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_bytes_and_index</span>(<span class="ident">bytes</span>: [<span class="ident">u8</span>; <span class="number">32</span>], <span class="ident">index</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> { <span class="ident">key</span>: <span class="ident">bytes</span>, <span class="ident">index</span>: <span class="ident">index</span>.<span class="ident">into</span>() }
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {

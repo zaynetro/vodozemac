@@ -176,7 +176,7 @@
         <span class="kw">if</span> <span class="ident">version</span> <span class="op">!</span><span class="op">=</span> <span class="ident">VERSION</span> {
             <span class="prelude-val">Err</span>(<span class="ident">DecodeError::InvalidVersion</span>(<span class="ident">VERSION</span>, <span class="ident">version</span>))
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">message</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">1</span> <span class="op">+</span> <span class="ident"><span class="self">Self</span>::MESSAGE_SUFFIX_LENGTH</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">DecodeError::MessageToShort</span>(<span class="ident">message</span>.<span class="ident">len</span>()))
+            <span class="prelude-val">Err</span>(<span class="ident">DecodeError::MessageTooShort</span>(<span class="ident">message</span>.<span class="ident">len</span>()))
         } <span class="kw">else</span> {
             <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">InnerMegolmMessage::decode</span>(
                 <span class="kw-2">&amp;</span><span class="ident">message</span>[<span class="number">1</span>..<span class="ident">message</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident"><span class="self">Self</span>::MESSAGE_SUFFIX_LENGTH</span>],
