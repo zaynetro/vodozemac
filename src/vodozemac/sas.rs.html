@@ -432,8 +432,8 @@
 <span class="doccomment">//! let alice_bytes = alice.bytes(&quot;AGREED_INFO&quot;);</span>
 <span class="doccomment">//! let bob_bytes = bob.bytes(&quot;AGREED_INFO&quot;);</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! let alice_emojis = alice_bytes.emoji_index();</span>
-<span class="doccomment">//! let bob_emojis = bob_bytes.emoji_index();</span>
+<span class="doccomment">//! let alice_emojis = alice_bytes.emoji_indices();</span>
+<span class="doccomment">//! let bob_emojis = bob_bytes.emoji_indices();</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! assert_eq!(alice_emojis, bob_emojis);</span>
 <span class="doccomment">//! ```</span>
@@ -499,7 +499,7 @@
     <span class="doccomment">/// The table that maps the index to an emoji can be found in the [spec].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [spec]: https://spec.matrix.org/unstable/client-server-api/#sas-method-emoji</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emoji_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; [<span class="ident">u8</span>; <span class="number">7</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emoji_indices</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; [<span class="ident">u8</span>; <span class="number">7</span>] {
         <span class="ident"><span class="self">Self</span>::bytes_to_emoji_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">bytes</span>)
     }
 
@@ -507,7 +507,7 @@
     <span class="doccomment">/// the key verification, as described in the [spec]</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [spec]: https://spec.matrix.org/unstable/client-server-api/#sas-method-emoji</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decimlas</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">u16</span>, <span class="ident">u16</span>, <span class="ident">u16</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decimals</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">u16</span>, <span class="ident">u16</span>, <span class="ident">u16</span>) {
         <span class="ident"><span class="self">Self</span>::bytes_to_decimal</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">bytes</span>)
     }
 
