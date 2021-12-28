@@ -788,7 +788,7 @@
 <span class="kw">use</span> <span class="ident">rand::thread_rng</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">thiserror::Error</span>;
-<span class="kw">use</span> <span class="ident">x25519_dalek::StaticSecret</span> <span class="kw">as</span> <span class="ident">Curve25519SecretKey</span>;
+<span class="kw">use</span> <span class="ident">x25519_dalek</span>::{<span class="ident">ReusableSecret</span>, <span class="ident">StaticSecret</span> <span class="kw">as</span> <span class="ident">Curve25519SecretKey</span>};
 <span class="kw">use</span> <span class="ident">zeroize::Zeroize</span>;
 
 <span class="kw">use</span> <span class="self">self</span>::{
@@ -919,7 +919,7 @@
     ) -&gt; <span class="ident">Session</span> {
         <span class="kw">let</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">thread_rng</span>();
 
-        <span class="kw">let</span> <span class="ident">base_key</span> <span class="op">=</span> <span class="ident">Curve25519SecretKey::new</span>(<span class="ident">rng</span>);
+        <span class="kw">let</span> <span class="ident">base_key</span> <span class="op">=</span> <span class="ident">ReusableSecret::new</span>(<span class="ident">rng</span>);
         <span class="kw">let</span> <span class="ident">public_base_key</span> <span class="op">=</span> <span class="ident">Curve25519PublicKey::from</span>(<span class="kw-2">&amp;</span><span class="ident">base_key</span>);
 
         <span class="kw">let</span> <span class="ident">shared_secret</span> <span class="op">=</span> <span class="ident">Shared3DHSecret::new</span>(
@@ -1523,5 +1523,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (23f69235a 2021-12-20)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (f8abed9ed 2021-12-26)" ></div>
 </body></html>
