@@ -50,7 +50,7 @@ the other side. This completes the establishment of the Olm communication
 channel.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">anyhow::Result</span>;
-<span class="kw">use</span> <span class="ident">vodozemac::olm</span>::{<span class="ident">Account</span>, <span class="ident">OlmMessage</span>};
+<span class="kw">use</span> <span class="ident">vodozemac::olm</span>::{<span class="ident">Account</span>, <span class="ident">OlmMessage</span>, <span class="ident">InboundCreationResult</span>};
 
 <span class="kw">fn</span> <span class="ident">main</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">alice</span> <span class="op">=</span> <span class="ident">Account::new</span>();
@@ -68,12 +68,13 @@ channel.</p>
     <span class="kw">let</span> <span class="ident">alice_msg</span> <span class="op">=</span> <span class="ident">alice_session</span>.<span class="ident">encrypt</span>(<span class="ident">message</span>);
 
     <span class="kw">if</span> <span class="kw">let</span> <span class="ident">OlmMessage::PreKey</span>(<span class="ident">m</span>) <span class="op">=</span> <span class="ident">alice_msg</span>.<span class="ident">clone</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bob_session</span> <span class="op">=</span> <span class="ident">bob</span>
-            .<span class="ident">create_inbound_session</span>(<span class="ident">alice</span>.<span class="ident">curve25519_key</span>(), <span class="kw-2">&amp;</span><span class="ident">m</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">bob</span>.<span class="ident">create_inbound_session</span>(<span class="ident">alice</span>.<span class="ident">curve25519_key</span>(), <span class="kw-2">&amp;</span><span class="ident">m</span>)<span class="question-mark">?</span>;
+
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bob_session</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">session</span>;
+        <span class="kw">let</span> <span class="ident">what_bob_received</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">plaintext</span>;
 
         <span class="macro">assert_eq!</span>(<span class="ident">alice_session</span>.<span class="ident">session_id</span>(), <span class="ident">bob_session</span>.<span class="ident">session_id</span>());
 
-        <span class="kw">let</span> <span class="ident">what_bob_received</span> <span class="op">=</span> <span class="ident">bob_session</span>.<span class="ident">decrypt</span>(<span class="kw-2">&amp;</span><span class="ident">alice_msg</span>)<span class="question-mark">?</span>;
         <span class="macro">assert_eq!</span>(<span class="ident">message</span>, <span class="ident">what_bob_received</span>);
 
         <span class="kw">let</span> <span class="ident">bob_reply</span> <span class="op">=</span> <span class="string">&quot;Yes. Take this, it&#39;s dangerous out there!&quot;</span>;
