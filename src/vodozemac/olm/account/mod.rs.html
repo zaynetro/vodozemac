@@ -831,6 +831,7 @@
 <span id="829">829</span>
 <span id="830">830</span>
 <span id="831">831</span>
+<span id="832">832</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Damir Jelić, Denis Kasak</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -1652,7 +1653,8 @@
                 <span class="ident">e</span> =&gt; <span class="macro">bail!</span>(<span class="string">&quot;Expected a decryption error, got {:?}&quot;</span>, <span class="ident">e</span>),
             }
             <span class="macro">assert!</span>(
-                <span class="op">!</span><span class="ident">alice</span>.<span class="ident">one_time_keys</span>().<span class="ident">is_empty</span>(),
+                <span class="op">!</span><span class="ident">alice</span>.<span class="ident">one_time_keys</span>.<span class="ident">private_keys</span>.<span class="ident">is_empty</span>()
+                    <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">alice</span>.<span class="ident">one_time_keys</span>.<span class="ident">private_keys</span>.<span class="ident">is_empty</span>(),
                 <span class="string">&quot;The one-time key was removed when it shouldn&#39;t&quot;</span>
             );
 
