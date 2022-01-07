@@ -199,6 +199,25 @@
 <span id="197">197</span>
 <span id="198">198</span>
 <span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Denis Kasak, Damir Jelić</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -314,12 +333,31 @@
         <span class="ident">base64_encode</span>(<span class="self">self</span>.<span class="ident">as_bytes</span>())
     }
 
+    <span class="doccomment">/// Verify that the provided signature for a given message has been signed</span>
+    <span class="doccomment">/// by the private key matching this public one.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// By default this performs an [RFC8032] compatible signature check. A</span>
+    <span class="doccomment">/// stricter version of the signature check can be enabled with the</span>
+    <span class="doccomment">/// `strict-signatures` feature flag.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The stricter variant is compatible with libsodium 0.16 and under the</span>
+    <span class="doccomment">/// hood uses the [`ed25519_dalek::PublicKey::verify_strict()`] method.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// For more info, see the ed25519_dalek [README] and [this] post.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [RFC8032]: https://datatracker.ietf.org/doc/html/rfc8032#section-5.1.7</span>
+    <span class="doccomment">/// [README]: https://github.com/dalek-cryptography/ed25519-dalek#a-note-on-signature-malleability</span>
+    <span class="doccomment">/// [this]: https://hdevalence.ca/blog/2020-10-04-its-25519am</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">verify</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">message</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
         <span class="ident">signature</span>: <span class="kw-2">&amp;</span><span class="ident">Ed25519Signature</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">SignatureError</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">verify</span>(<span class="ident">message</span>, <span class="kw-2">&amp;</span><span class="ident">signature</span>.<span class="number">0</span>)
+        <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;strict-signatures&quot;</span>) {
+            <span class="self">self</span>.<span class="number">0</span>.<span class="ident">verify_strict</span>(<span class="ident">message</span>, <span class="kw-2">&amp;</span><span class="ident">signature</span>.<span class="number">0</span>)
+        } <span class="kw">else</span> {
+            <span class="self">self</span>.<span class="number">0</span>.<span class="ident">verify</span>(<span class="ident">message</span>, <span class="kw-2">&amp;</span><span class="ident">signature</span>.<span class="number">0</span>)
+        }
     }
 }
 
