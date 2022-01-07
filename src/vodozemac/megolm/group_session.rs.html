@@ -237,7 +237,7 @@
 <span class="kw">use</span> <span class="ident">zeroize::Zeroize</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">message::MegolmMessage</span>,
+    <span class="ident">message::EncodedMegolmMessage</span>,
     <span class="ident">ratchet</span>::{<span class="ident">MegolmRatchetUnpicklingError</span>, <span class="ident">Ratchet</span>, <span class="ident">RatchetPickle</span>},
     <span class="ident">SessionKey</span>, <span class="ident">SESSION_KEY_VERSION</span>,
 };
@@ -303,7 +303,7 @@
         <span class="kw">let</span> <span class="ident">cipher</span> <span class="op">=</span> <span class="ident">Cipher::new_megolm</span>(<span class="self">self</span>.<span class="ident">ratchet</span>.<span class="ident">as_bytes</span>());
 
         <span class="kw">let</span> <span class="ident">ciphertext</span> <span class="op">=</span> <span class="ident">cipher</span>.<span class="ident">encrypt</span>(<span class="ident">plaintext</span>.<span class="ident">as_ref</span>());
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">MegolmMessage::new</span>(<span class="ident">ciphertext</span>, <span class="self">self</span>.<span class="ident">message_index</span>());
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">EncodedMegolmMessage::new</span>(<span class="ident">ciphertext</span>, <span class="self">self</span>.<span class="ident">message_index</span>());
 
         <span class="kw">let</span> <span class="ident">mac</span> <span class="op">=</span> <span class="ident">cipher</span>.<span class="ident">mac</span>(<span class="ident">message</span>.<span class="ident">bytes_for_mac</span>());
         <span class="ident">message</span>.<span class="ident">append_mac</span>(<span class="ident">mac</span>);

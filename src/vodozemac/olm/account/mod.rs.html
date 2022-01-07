@@ -826,10 +826,6 @@
 <span id="824">824</span>
 <span id="825">825</span>
 <span id="826">826</span>
-<span id="827">827</span>
-<span id="828">828</span>
-<span id="829">829</span>
-<span id="830">830</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Damir Jelić, Denis Kasak</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -864,7 +860,7 @@
     <span class="ident">one_time_keys</span>::{<span class="ident">OneTimeKeys</span>, <span class="ident">OneTimeKeysPickle</span>},
 };
 <span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">messages</span>::{<span class="ident">InnerMessage</span>, <span class="ident">InnerPreKeyMessage</span>, <span class="ident">PreKeyMessage</span>},
+    <span class="ident">messages::PreKeyMessage</span>,
     <span class="ident">session</span>::{<span class="ident">DecryptionError</span>, <span class="ident">Session</span>},
     <span class="ident">session_keys::SessionKeys</span>,
     <span class="ident">shared_secret</span>::{<span class="ident">RemoteShared3DHSecret</span>, <span class="ident">Shared3DHSecret</span>},
@@ -1036,45 +1032,41 @@
         <span class="ident">their_identity_key</span>: <span class="kw-2">&amp;</span><span class="ident">Curve25519PublicKey</span>,
         <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">PreKeyMessage</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">InboundCreationResult</span>, <span class="ident">SessionCreationError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">base64_decode</span>(<span class="kw-2">&amp;</span><span class="ident">message</span>.<span class="ident">inner</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">InnerPreKeyMessage::from</span>(<span class="ident">message</span>);
+        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">message</span>.<span class="ident">decode</span>()<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> (<span class="ident">public_one_time_key</span>, <span class="ident">remote_one_time_key</span>, <span class="ident">remote_identity_key</span>, <span class="ident">m</span>) <span class="op">=</span>
-            <span class="ident">message</span>.<span class="ident">decode</span>()<span class="question-mark">?</span>;
-
-        <span class="kw">if</span> <span class="ident">their_identity_key</span> <span class="op">!</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">remote_identity_key</span> {
+        <span class="kw">if</span> <span class="ident">their_identity_key</span> <span class="op">!</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">message</span>.<span class="ident">remote_identity_key</span> {
             <span class="prelude-val">Err</span>(<span class="ident">SessionCreationError::MismatchedIdentityKey</span>)
         } <span class="kw">else</span> {
             <span class="comment">// Find the matching private key that the message claims to have</span>
             <span class="comment">// used to create the Session that encrypted it.</span>
             <span class="kw">let</span> <span class="ident">one_time_key</span> <span class="op">=</span> <span class="self">self</span>
-                .<span class="ident">find_one_time_key</span>(<span class="kw-2">&amp;</span><span class="ident">public_one_time_key</span>)
+                .<span class="ident">find_one_time_key</span>(<span class="kw-2">&amp;</span><span class="ident">message</span>.<span class="ident">public_one_time_key</span>)
                 .<span class="ident">ok_or</span>(<span class="ident">SessionCreationError::MissingOneTimeKey</span>)<span class="question-mark">?</span>;
 
             <span class="comment">// Construct a 3DH shared secret from the various curve25519 keys.</span>
             <span class="kw">let</span> <span class="ident">shared_secret</span> <span class="op">=</span> <span class="ident">RemoteShared3DHSecret::new</span>(
                 <span class="self">self</span>.<span class="ident">diffie_hellman_key</span>.<span class="ident">secret_key</span>(),
                 <span class="ident">one_time_key</span>,
-                <span class="kw-2">&amp;</span><span class="ident">remote_identity_key</span>,
-                <span class="kw-2">&amp;</span><span class="ident">remote_one_time_key</span>,
+                <span class="kw-2">&amp;</span><span class="ident">message</span>.<span class="ident">remote_identity_key</span>,
+                <span class="kw-2">&amp;</span><span class="ident">message</span>.<span class="ident">remote_one_time_key</span>,
             );
 
             <span class="comment">// These will be used to uniquely identify the Session.</span>
             <span class="kw">let</span> <span class="ident">session_keys</span> <span class="op">=</span> <span class="ident">SessionKeys</span> {
-                <span class="ident">identity_key</span>: <span class="ident">remote_identity_key</span>,
-                <span class="ident">base_key</span>: <span class="ident">remote_one_time_key</span>,
-                <span class="ident">one_time_key</span>: <span class="ident">public_one_time_key</span>,
+                <span class="ident">identity_key</span>: <span class="ident">message</span>.<span class="ident">remote_identity_key</span>,
+                <span class="ident">base_key</span>: <span class="ident">message</span>.<span class="ident">remote_one_time_key</span>,
+                <span class="ident">one_time_key</span>: <span class="ident">message</span>.<span class="ident">public_one_time_key</span>,
             };
 
-            <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">InnerMessage::from</span>(<span class="ident">m</span>);
-            <span class="kw">let</span> <span class="ident">decoded</span> <span class="op">=</span> <span class="ident">message</span>.<span class="ident">decode</span>()<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">olm_message</span> <span class="op">=</span> <span class="ident">message</span>.<span class="ident">message</span>;
 
             <span class="comment">// Create a Session, AKA a double ratchet, this one will have an</span>
             <span class="comment">// inactive sending chain until we decide to encrypt a message.</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">Session::new_remote</span>(<span class="ident">shared_secret</span>, <span class="ident">decoded</span>.<span class="ident">ratchet_key</span>, <span class="ident">session_keys</span>);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">session</span> <span class="op">=</span>
+                <span class="ident">Session::new_remote</span>(<span class="ident">shared_secret</span>, <span class="ident">olm_message</span>.<span class="ident">ratchet_key</span>, <span class="ident">session_keys</span>);
 
             <span class="comment">// Decrypt the message to check if the Session is actually valid.</span>
-            <span class="kw">let</span> <span class="ident">plaintext</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">decrypt_decoded</span>(<span class="ident">message</span>, <span class="ident">decoded</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">plaintext</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">decrypt_decoded</span>(<span class="ident">olm_message</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">plaintext</span> <span class="op">=</span> <span class="ident">String::from_utf8_lossy</span>(<span class="kw-2">&amp;</span><span class="ident">plaintext</span>).<span class="ident">to_string</span>();
 
             <span class="comment">// We only drop the one-time key now, this is why we can&#39;t use a</span>
@@ -1084,7 +1076,7 @@
             <span class="comment">// try to use such an one-time key won&#39;t be able to commnuicate with</span>
             <span class="comment">// us. This is strictly worse than the one-time key exhaustion</span>
             <span class="comment">// scenario.</span>
-            <span class="self">self</span>.<span class="ident">remove_one_time_key</span>(<span class="kw-2">&amp;</span><span class="ident">public_one_time_key</span>);
+            <span class="self">self</span>.<span class="ident">remove_one_time_key</span>(<span class="kw-2">&amp;</span><span class="ident">message</span>.<span class="ident">public_one_time_key</span>);
 
             <span class="prelude-val">Ok</span>(<span class="ident">InboundCreationResult</span> { <span class="ident">session</span>, <span class="ident">plaintext</span> })
         }
