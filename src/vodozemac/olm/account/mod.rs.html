@@ -830,8 +830,6 @@
 <span id="828">828</span>
 <span id="829">829</span>
 <span id="830">830</span>
-<span id="831">831</span>
-<span id="832">832</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Damir Jelić, Denis Kasak</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -855,7 +853,6 @@
     <span class="ident">ops::Deref</span>,
 };
 
-<span class="kw">use</span> <span class="ident">ed25519_dalek</span>::{<span class="ident">ExpandedSecretKey</span> <span class="kw">as</span> <span class="ident">Ed25519PrivateKey</span>, <span class="ident">PublicKey</span> <span class="kw">as</span> <span class="ident">Ed25519PublicKey</span>};
 <span class="kw">use</span> <span class="ident">rand::thread_rng</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">thiserror::Error</span>;
@@ -875,7 +872,7 @@
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">types</span>::{
         <span class="ident">Curve25519Keypair</span>, <span class="ident">Curve25519KeypairPickle</span>, <span class="ident">Curve25519PublicKey</span>, <span class="ident">Ed25519Keypair</span>,
-        <span class="ident">Ed25519KeypairPickle</span>, <span class="ident">Ed25519KeypairUnpicklingError</span>, <span class="ident">KeyId</span>,
+        <span class="ident">Ed25519KeypairPickle</span>, <span class="ident">Ed25519KeypairUnpicklingError</span>, <span class="ident">Ed25519PublicKey</span>, <span class="ident">KeyId</span>,
     },
     <span class="ident">utilities</span>::{<span class="ident">base64_decode</span>, <span class="ident">base64_encode</span>},
     <span class="ident">DecodeError</span>,
@@ -962,7 +959,7 @@
 
     <span class="doccomment">/// Sign the given message using our Ed25519 fingerprint key.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sign</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-        <span class="self">self</span>.<span class="ident">signing_key</span>.<span class="ident">sign</span>(<span class="ident">message</span>)
+        <span class="self">self</span>.<span class="ident">signing_key</span>.<span class="ident">sign</span>(<span class="ident">message</span>.<span class="ident">as_bytes</span>()).<span class="ident">to_base64</span>()
     }
 
     <span class="doccomment">/// Convert the account into a struct which implements [`serde::Serialize`]</span>
@@ -1188,7 +1185,8 @@
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">private_key</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">64</span>];
             <span class="ident">cursor</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">private_key</span>)<span class="question-mark">?</span>;
 
-            <span class="kw">let</span> <span class="ident">private_ed25519_key</span> <span class="op">=</span> <span class="ident">Ed25519PrivateKey::from_bytes</span>(<span class="kw-2">&amp;</span><span class="ident">private_key</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">signing_key</span> <span class="op">=</span> <span class="ident">Ed25519Keypair::from_expanded_key</span>(<span class="kw-2">&amp;</span><span class="ident">private_key</span>)<span class="question-mark">?</span>;
+            <span class="ident">private_key</span>.<span class="ident">zeroize</span>();
 
             <span class="kw">let</span> <span class="ident">secret_key</span> <span class="op">=</span> <span class="ident">read_curve_key</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">public_key</span> <span class="op">=</span> <span class="ident">Curve25519PublicKey::from</span>(<span class="kw-2">&amp;</span><span class="ident">secret_key</span>);
@@ -1250,8 +1248,6 @@
             } <span class="kw">else</span> {
                 <span class="prelude-val">None</span>
             };
-
-            <span class="kw">let</span> <span class="ident">signing_key</span> <span class="op">=</span> <span class="ident">Ed25519Keypair::from_expanded_key</span>(<span class="ident">private_ed25519_key</span>);
 
             <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
                 <span class="ident">signing_key</span>,
@@ -1617,7 +1613,7 @@
         <span class="kw">let</span> <span class="ident">account_with_expanded_key</span> <span class="op">=</span> <span class="ident">Account::from_libolm_pickle</span>(<span class="kw-2">&amp;</span><span class="ident">pickle</span>, <span class="ident">key</span>)<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">signing_key_clone</span> <span class="op">=</span> <span class="ident">account_with_expanded_key</span>.<span class="ident">signing_key</span>.<span class="ident">clone</span>();
-        <span class="ident">signing_key_clone</span>.<span class="ident">sign</span>(<span class="string">&quot;You met with a terrible fate, haven’t you?&quot;</span>);
+        <span class="ident">signing_key_clone</span>.<span class="ident">sign</span>(<span class="string">&quot;You met with a terrible fate, haven’t you?&quot;</span>.<span class="ident">as_bytes</span>());
         <span class="ident">account_with_expanded_key</span>.<span class="ident">sign</span>(<span class="string">&quot;You met with a terrible fate, haven’t you?&quot;</span>);
 
         <span class="prelude-val">Ok</span>(())

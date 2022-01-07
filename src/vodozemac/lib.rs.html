@@ -107,7 +107,7 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">olm</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">sas</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">types</span>::{<span class="ident">Curve25519KeyError</span>, <span class="ident">Curve25519PublicKey</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">types</span>::{<span class="ident">Curve25519KeyError</span>, <span class="ident">Curve25519PublicKey</span>, <span class="ident">Ed25519PublicKey</span>, <span class="ident">SignatureError</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">thiserror::Error</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">LibolmUnpickleError</span> {
@@ -120,7 +120,7 @@
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The pickle couldn&#39;t be decrypted: {0}&quot;</span>)]</span>
     <span class="ident">Decryption</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident"><span class="kw">crate</span>::cipher::DecryptionError</span>),
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The pickle contained an invalid ed25519 public key {0}&quot;</span>)]</span>
-    <span class="ident">PublicKey</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">ed25519_dalek::SignatureError</span>),
+    <span class="ident">PublicKey</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">SignatureError</span>),
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The pickle didn&#39;t contain a valid Olm session&quot;</span>)]</span>
     <span class="ident">InvalidSession</span>,
 }
@@ -138,7 +138,7 @@
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The message contained a MAC with an invalid size, expected {0}, got {1}&quot;</span>)]</span>
     <span class="ident">InvalidMacLength</span>(<span class="ident">usize</span>, <span class="ident">usize</span>),
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The message contained an invalid Signature: {0}&quot;</span>)]</span>
-    <span class="ident">Signature</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">ed25519_dalek::SignatureError</span>),
+    <span class="ident">Signature</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">SignatureError</span>),
     <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
     <span class="ident">ProtoBufError</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">prost::DecodeError</span>),
 }
