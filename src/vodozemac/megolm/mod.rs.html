@@ -227,9 +227,6 @@
 <span id="222">222</span>
 <span id="223">223</span>
 <span id="224">224</span>
-<span id="225">225</span>
-<span id="226">226</span>
-<span id="227">227</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -251,12 +248,9 @@
 <span class="kw">mod</span> <span class="ident">message</span>;
 <span class="kw">mod</span> <span class="ident">ratchet</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">group_session</span>::{
-    <span class="ident">GroupSession</span>, <span class="ident">GroupSessionPickle</span>, <span class="ident">GroupSessionPickledJSON</span>, <span class="ident">GroupSessionUnpicklingError</span>,
-};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">group_session</span>::{<span class="ident">GroupSession</span>, <span class="ident">GroupSessionPickledJSON</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">inbound_group_session</span>::{
     <span class="ident">DecryptedMessage</span>, <span class="ident">DecryptionError</span>, <span class="ident">ExportedSessionKey</span>, <span class="ident">InboundGroupSession</span>,
-    <span class="ident">InboundGroupSessionPickle</span>, <span class="ident">InboundGroupSessionPickledJSON</span>, <span class="ident">InboundGroupSessionUnpicklingError</span>,
     <span class="ident">SessionCreationError</span>,
 };
 <span class="kw">use</span> <span class="ident">zeroize::Zeroize</span>;

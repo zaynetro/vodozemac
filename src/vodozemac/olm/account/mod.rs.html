@@ -845,20 +845,6 @@
 <span id="840">840</span>
 <span id="841">841</span>
 <span id="842">842</span>
-<span id="843">843</span>
-<span id="844">844</span>
-<span id="845">845</span>
-<span id="846">846</span>
-<span id="847">847</span>
-<span id="848">848</span>
-<span id="849">849</span>
-<span id="850">850</span>
-<span id="851">851</span>
-<span id="852">852</span>
-<span id="853">853</span>
-<span id="854">854</span>
-<span id="855">855</span>
-<span id="856">856</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Damir Jelić, Denis Kasak</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -923,15 +909,6 @@
     <span class="ident">Decryption</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">DecryptionError</span>),
 }
 
-<span class="doccomment">/// Struct holding the two public identity keys of an [`Account`].</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IdentityKeys</span> {
-    <span class="doccomment">/// The ed25519 key, used for signing.</span>
-    <span class="kw">pub</span> <span class="ident">ed25519</span>: <span class="ident">Ed25519PublicKey</span>,
-    <span class="doccomment">/// The curve25519 key, used for to establish shared secrets.</span>
-    <span class="kw">pub</span> <span class="ident">curve25519</span>: <span class="ident">Curve25519PublicKey</span>,
-}
-
 <span class="doccomment">/// Return type for the creation of inbound [`Session`] objects.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InboundCreationResult</span> {
@@ -968,11 +945,6 @@
             <span class="ident">one_time_keys</span>: <span class="ident">OneTimeKeys::new</span>(),
             <span class="ident">fallback_keys</span>: <span class="ident">FallbackKeys::new</span>(),
         }
-    }
-
-    <span class="doccomment">/// Get the IdentityKeys of this Account</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">identity_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">IdentityKeys</span> {
-        <span class="ident">IdentityKeys</span> { <span class="ident">ed25519</span>: <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">ed25519_key</span>(), <span class="ident">curve25519</span>: <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">curve25519_key</span>() }
     }
 
     <span class="doccomment">/// Get a reference to the account&#39;s public Ed25519 key</span>

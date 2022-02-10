@@ -413,9 +413,6 @@
 <span id="408">408</span>
 <span id="409">409</span>
 <span id="410">410</span>
-<span id="411">411</span>
-<span id="412">412</span>
-<span id="413">413</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -465,8 +462,6 @@
     <span class="ident">Base64</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">base64::DecodeError</span>),
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The signature on the session key was invalid: {0}&quot;</span>)]</span>
     <span class="ident">Signature</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">SignatureError</span>),
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The public key of session was invalid: {0}&quot;</span>)]</span>
-    <span class="ident">PublicKey</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident"><span class="kw">crate</span>::PublicKeyError</span>),
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Error</span>)]</span>
@@ -502,8 +497,7 @@
     <span class="kw">pub</span> <span class="ident">message_index</span>: <span class="ident">u32</span>,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Zeroize</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Zeroize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ExportedSessionKey</span>(<span class="kw">pub</span> <span class="ident">String</span>);
 
 <span class="kw">impl</span> <span class="ident">ExportedSessionKey</span> {
@@ -548,13 +542,13 @@
             <span class="ident">cursor</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ratchet</span>)<span class="question-mark">?</span>;
             <span class="ident">cursor</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">public_key</span>)<span class="question-mark">?</span>;
 
-            <span class="kw">let</span> <span class="ident">signing_key</span> <span class="op">=</span> <span class="ident">Ed25519PublicKey::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">public_key</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">signing_key</span> <span class="op">=</span> <span class="ident">Ed25519PublicKey::from_bytes</span>(<span class="kw-2">&amp;</span><span class="ident">public_key</span>)<span class="question-mark">?</span>;
 
             <span class="kw">let</span> <span class="ident">signing_key_verified</span> <span class="op">=</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">is_export</span> {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">signature</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="ident">Ed25519Signature::LENGTH</span>];
 
                 <span class="ident">cursor</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">signature</span>)<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">signature</span> <span class="op">=</span> <span class="ident">Ed25519Signature::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">signature</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">signature</span> <span class="op">=</span> <span class="ident">Ed25519Signature::from_bytes</span>(<span class="kw-2">&amp;</span><span class="ident">signature</span>)<span class="question-mark">?</span>;
 
                 <span class="kw">let</span> <span class="ident">decoded</span> <span class="op">=</span> <span class="ident">cursor</span>.<span class="ident">into_inner</span>();
 
@@ -716,7 +710,7 @@
 
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">signing_key</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="ident">Ed25519PublicKey::LENGTH</span>];
             <span class="ident">cursor</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">signing_key</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">signing_key</span> <span class="op">=</span> <span class="ident">Ed25519PublicKey::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">signing_key</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">signing_key</span> <span class="op">=</span> <span class="ident">Ed25519PublicKey::from_bytes</span>(<span class="kw-2">&amp;</span><span class="ident">signing_key</span>)<span class="question-mark">?</span>;
 
             <span class="kw">let</span> <span class="ident">signing_key_verified</span> <span class="op">=</span> <span class="ident">read_bool</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>)<span class="question-mark">?</span>;
 
