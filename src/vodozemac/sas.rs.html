@@ -429,6 +429,106 @@
 <span id="424">424</span>
 <span id="425">425</span>
 <span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Damir Jelić, Denis Kasak</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -483,7 +583,7 @@
 <span class="doccomment">//! [ZRTP]: https://tools.ietf.org/html/rfc6189#section-4.4.1</span>
 
 <span class="kw">use</span> <span class="ident">hkdf::Hkdf</span>;
-<span class="kw">use</span> <span class="ident">hmac</span>::{<span class="ident">digest::MacError</span>, <span class="ident">Hmac</span>, <span class="ident">Mac</span>};
+<span class="kw">use</span> <span class="ident">hmac</span>::{<span class="ident">digest::MacError</span>, <span class="ident">Hmac</span>, <span class="ident">Mac</span> <span class="kw">as</span> <span class="kw">_</span>};
 <span class="kw">use</span> <span class="ident">rand::thread_rng</span>;
 <span class="kw">use</span> <span class="ident">sha2::Sha256</span>;
 <span class="kw">use</span> <span class="ident">thiserror::Error</span>;
@@ -491,10 +591,37 @@
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">utilities</span>::{<span class="ident">base64_decode</span>, <span class="ident">base64_encode</span>},
-    <span class="ident">Curve25519KeyError</span>, <span class="ident">Curve25519PublicKey</span>,
+    <span class="ident">Curve25519PublicKey</span>, <span class="ident">PublicKeyError</span>,
 };
 
 <span class="kw">type</span> <span class="ident">HmacSha256Key</span> <span class="op">=</span> [<span class="ident">u8</span>; <span class="number">32</span>];
+
+<span class="doccomment">/// The output type for the SAS MAC calculation.</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Mac</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>);
+
+<span class="kw">impl</span> <span class="ident">Mac</span> {
+    <span class="doccomment">/// Convert the MAC to a base64 encoded string.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_base64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
+        <span class="ident">base64_encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>)
+    }
+
+    <span class="doccomment">/// Get the byte slice of the MAC.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
+    }
+
+    <span class="doccomment">/// Create a new `Mac` object from a byte slice.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_slice</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span>(<span class="ident">bytes</span>.<span class="ident">to_vec</span>())
+    }
+
+    <span class="doccomment">/// Create a new `Mac` object from a base64 encoded string.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_base64</span>(<span class="ident">mac</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">base64::DecodeError</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">base64_decode</span>(<span class="ident">mac</span>)<span class="question-mark">?</span>;
+
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(<span class="ident">bytes</span>))
+    }
+}
 
 <span class="doccomment">/// Error type for the case when we try to generate too many SAS bytes.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Error</span>)]</span>
@@ -504,25 +631,9 @@
 <span class="doccomment">/// Error type describing failures that can happen during the key verification.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Error</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SasError</span> {
-    <span class="doccomment">/// The MAC code that was given wasn&#39;t valid base64.</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The SAS MAC wasn&#39;t valid base64: {0}&quot;</span>)]</span>
-    <span class="ident">Base64</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">base64::DecodeError</span>),
     <span class="doccomment">/// The MAC failed to be validated.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The SAS MAC validation didn&#39;t succeed: {0}&quot;</span>)]</span>
     <span class="ident">Mac</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">MacError</span>),
-}
-
-<span class="doccomment">/// Error type describing failures that can happen when we try to create a</span>
-<span class="doccomment">/// shared secret.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Error</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">PublicKeyError</span> {
-    <span class="doccomment">/// The given public curve25519 key wasn&#39;t valid.</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
-    <span class="ident">PublicKey</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">Curve25519KeyError</span>),
-    <span class="doccomment">/// At least one of the keys did not have contributory behaviour and the</span>
-    <span class="doccomment">/// resulting shared secret would have been insecure.</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;At least one of the keys did not have contributory behaviour&quot;</span>)]</span>
-    <span class="ident">NonContributoryKey</span>,
 }
 
 <span class="doccomment">/// A struct representing a short auth string verification object.</span>
@@ -542,6 +653,17 @@
 <span class="doccomment">/// verify a MAC that protects information about the keys being verified.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EstablishedSas</span> {
     <span class="ident">shared_secret</span>: <span class="ident">SharedSecret</span>,
+    <span class="ident">our_public_key</span>: <span class="ident">Curve25519PublicKey</span>,
+    <span class="ident">their_public_key</span>: <span class="ident">Curve25519PublicKey</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">EstablishedSas</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
+        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;EstablishedSas&quot;</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;our_public_key&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">our_public_key</span>.<span class="ident">to_base64</span>())
+            .<span class="ident">field</span>(<span class="string">&quot;their_public_key&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">their_public_key</span>.<span class="ident">to_base64</span>())
+            .<span class="ident">finish_non_exhaustive</span>()
+    }
 }
 
 <span class="doccomment">/// Bytes generated from an shared secret that can be used as the short auth</span>
@@ -657,12 +779,12 @@
     <span class="doccomment">/// [`SasBytes`] if the given public key was valid, otherwise `None`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">diffie_hellman</span>(
         <span class="self">self</span>,
-        <span class="ident">other_public_key</span>: <span class="ident">Curve25519PublicKey</span>,
+        <span class="ident">their_public_key</span>: <span class="ident">Curve25519PublicKey</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">EstablishedSas</span>, <span class="ident">PublicKeyError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">shared_secret</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">secret_key</span>.<span class="ident">diffie_hellman</span>(<span class="kw-2">&amp;</span><span class="ident">other_public_key</span>.<span class="ident">inner</span>);
+        <span class="kw">let</span> <span class="ident">shared_secret</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">secret_key</span>.<span class="ident">diffie_hellman</span>(<span class="kw-2">&amp;</span><span class="ident">their_public_key</span>.<span class="ident">inner</span>);
 
         <span class="kw">if</span> <span class="ident">shared_secret</span>.<span class="ident">was_contributory</span>() {
-            <span class="prelude-val">Ok</span>(<span class="ident">EstablishedSas</span> { <span class="ident">shared_secret</span> })
+            <span class="prelude-val">Ok</span>(<span class="ident">EstablishedSas</span> { <span class="ident">shared_secret</span>, <span class="ident">our_public_key</span>: <span class="self">self</span>.<span class="ident">public_key</span>, <span class="ident">their_public_key</span> })
         } <span class="kw">else</span> {
             <span class="prelude-val">Err</span>(<span class="ident">PublicKeyError::NonContributoryKey</span>)
         }
@@ -725,12 +847,64 @@
     <span class="doccomment">/// The MAC is returned as a base64 encoded string.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Account`]: crate::olm::Account</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">calculate_mac</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">info</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">calculate_mac</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">info</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Mac</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mac</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_mac</span>(<span class="ident">info</span>);
 
         <span class="ident">mac</span>.<span class="ident">update</span>(<span class="ident">input</span>.<span class="ident">as_ref</span>());
 
-        <span class="ident">base64_encode</span>(<span class="ident">mac</span>.<span class="ident">finalize</span>().<span class="ident">into_bytes</span>())
+        <span class="ident">Mac</span>(<span class="ident">mac</span>.<span class="ident">finalize</span>().<span class="ident">into_bytes</span>().<span class="ident">to_vec</span>())
+    }
+
+    <span class="doccomment">/// Calculate a MAC for the given input using the info string as additional</span>
+    <span class="doccomment">/// data, the MAC is returned as an invalid base64 encoded string.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Warning**: This method should never be used unless you require libolm</span>
+    <span class="doccomment">/// compatibility. Libolm used to incorrectly encode their MAC because the</span>
+    <span class="doccomment">/// input buffer was reused as the output buffer. This method replicates the</span>
+    <span class="doccomment">/// buggy behaviour.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">calculate_mac_invalid_base64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">info</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
+        <span class="comment">// First calculate the MAC as usual.</span>
+        <span class="kw">let</span> <span class="ident">mac</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">calculate_mac</span>(<span class="ident">input</span>, <span class="ident">info</span>);
+
+        <span class="comment">// Since the input buffer is reused as an output buffer, and base64</span>
+        <span class="comment">// operates on 3 input bytes to generate 4 output bytes the input</span>
+        <span class="comment">// buffer gets overrun by the output.</span>
+        <span class="comment">//</span>
+        <span class="comment">// Only 6 bytes of the MAC get to be used before the output overwrites</span>
+        <span class="comment">// the input.</span>
+
+        <span class="comment">// For the first pass all three bytes from the MAC are used.</span>
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">base64_encode</span>(<span class="kw-2">&amp;</span><span class="ident">mac</span>.<span class="ident">as_bytes</span>()[<span class="number">0</span>..<span class="number">3</span>]);
+
+        <span class="comment">// Next up, we&#39;re using increasingly more output from the previous</span>
+        <span class="comment">// output, the MAC is used for two iterations here.</span>
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes_from_mac</span> <span class="op">=</span> <span class="number">2</span>;
+
+        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> (<span class="number">6</span>..<span class="number">10</span>).<span class="ident">step_by</span>(<span class="number">3</span>) {
+            <span class="kw">let</span> <span class="ident">from_mac</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">mac</span>.<span class="ident">as_bytes</span>()[<span class="ident">i</span> <span class="op">-</span> <span class="ident">bytes_from_mac</span>..<span class="ident">i</span>];
+            <span class="kw">let</span> <span class="ident">from_out</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">out</span>.<span class="ident">as_bytes</span>()[<span class="ident">out</span>.<span class="ident">len</span>() <span class="op">-</span> (<span class="number">3</span> <span class="op">-</span> <span class="ident">bytes_from_mac</span>)..];
+
+            <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> [<span class="ident">from_out</span>, <span class="ident">from_mac</span>].<span class="ident">concat</span>();
+            <span class="kw">let</span> <span class="ident">encoded</span> <span class="op">=</span> <span class="ident">base64_encode</span>(<span class="ident">bytes</span>);
+            <span class="ident">bytes_from_mac</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
+
+            <span class="ident">out</span> <span class="op">=</span> <span class="ident">out</span> <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">encoded</span>;
+        }
+
+        <span class="comment">// Now only the previous output gets used. The MAC has a size of 32, so</span>
+        <span class="comment">// we abort before we get to the remainder calculation.</span>
+        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> (<span class="number">9</span>..<span class="number">30</span>).<span class="ident">step_by</span>(<span class="number">3</span>) {
+            <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">out</span>.<span class="ident">as_bytes</span>()[<span class="ident">i</span>..<span class="ident">i</span> <span class="op">+</span> <span class="number">3</span>];
+            <span class="kw">let</span> <span class="ident">next_four</span> <span class="op">=</span> <span class="ident">base64_encode</span>(<span class="ident">next</span>);
+            <span class="ident">out</span> <span class="op">=</span> <span class="ident">out</span> <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">next_four</span>;
+        }
+
+        <span class="comment">// Finally, use the remainder to get the last 3 bytes of output. No</span>
+        <span class="comment">// padding is used.</span>
+        <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">out</span>.<span class="ident">as_bytes</span>()[<span class="number">30</span>..<span class="number">32</span>];
+        <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="ident">base64_encode</span>(<span class="ident">next</span>);
+
+        <span class="ident">out</span> <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">next</span>
     }
 
     <span class="doccomment">/// Verify a MAC that was previously created using the</span>
@@ -738,13 +912,23 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Users should calculate a MAC and send it to the other side, they should</span>
     <span class="doccomment">/// then verify each other&#39;s MAC using this method.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">verify_mac</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">info</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">tag</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">SasError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">tag</span> <span class="op">=</span> <span class="ident">base64_decode</span>(<span class="ident">tag</span>)<span class="question-mark">?</span>;
-
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">verify_mac</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">info</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">tag</span>: <span class="kw-2">&amp;</span><span class="ident">Mac</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">SasError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mac</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_mac</span>(<span class="ident">info</span>);
         <span class="ident">mac</span>.<span class="ident">update</span>(<span class="ident">input</span>.<span class="ident">as_bytes</span>());
 
-        <span class="prelude-val">Ok</span>(<span class="ident">mac</span>.<span class="ident">verify_slice</span>(<span class="kw-2">&amp;</span><span class="ident">tag</span>)<span class="question-mark">?</span>)
+        <span class="prelude-val">Ok</span>(<span class="ident">mac</span>.<span class="ident">verify_slice</span>(<span class="kw-2">&amp;</span><span class="ident">tag</span>.<span class="number">0</span>)<span class="question-mark">?</span>)
+    }
+
+    <span class="doccomment">/// Get the public key that was created by us, that was used to establish</span>
+    <span class="doccomment">/// the shared secret.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">our_public_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Curve25519PublicKey</span> {
+        <span class="self">self</span>.<span class="ident">our_public_key</span>
+    }
+
+    <span class="doccomment">/// Get the public key that was created by the other party, that was used to</span>
+    <span class="doccomment">/// establish the shared secret.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">their_public_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Curve25519PublicKey</span> {
+        <span class="self">self</span>.<span class="ident">their_public_key</span>
     }
 
     <span class="kw">fn</span> <span class="ident">get_hkdf</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Hkdf</span><span class="op">&lt;</span><span class="ident">Sha256</span><span class="op">&gt;</span> {
@@ -772,7 +956,7 @@
     <span class="kw">use</span> <span class="ident">olm_rs::sas::OlmSas</span>;
     <span class="kw">use</span> <span class="ident">proptest::prelude</span>::<span class="kw-2">*</span>;
 
-    <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Sas</span>, <span class="ident">SasBytes</span>};
+    <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Mac</span>, <span class="ident">Sas</span>, <span class="ident">SasBytes</span>};
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">generate_bytes</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
@@ -792,7 +976,6 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="comment">// Allowed to fail due to https://gitlab.matrix.org/matrix-org/olm/-/merge_requests/16</span>
     <span class="kw">fn</span> <span class="ident">calculate_mac</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">olm</span> <span class="op">=</span> <span class="ident">OlmSas::new</span>();
         <span class="kw">let</span> <span class="ident">dalek</span> <span class="op">=</span> <span class="ident">Sas::new</span>();
@@ -803,9 +986,26 @@
 
         <span class="kw">let</span> <span class="ident">olm_mac</span> <span class="op">=</span>
             <span class="ident">olm</span>.<span class="ident">calculate_mac_fixed_base64</span>(<span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;libolm couldn&#39;t calculate a MAC&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">olm_mac</span>, <span class="ident">established</span>.<span class="ident">calculate_mac</span>(<span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">olm_mac</span>, <span class="ident">established</span>.<span class="ident">calculate_mac</span>(<span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>).<span class="ident">to_base64</span>());
 
-        <span class="ident">established</span>.<span class="ident">verify_mac</span>(<span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="ident">olm_mac</span>.<span class="ident">as_str</span>())<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">olm_mac</span> <span class="op">=</span> <span class="ident">Mac::from_base64</span>(<span class="kw-2">&amp;</span><span class="ident">olm_mac</span>).<span class="ident">expect</span>(<span class="string">&quot;Olm MAC wasn&#39;t valid base64&quot;</span>);
+
+        <span class="ident">established</span>.<span class="ident">verify_mac</span>(<span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">olm_mac</span>)<span class="question-mark">?</span>;
+
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">calculate_mac_invalid_base64</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">olm</span> <span class="op">=</span> <span class="ident">OlmSas::new</span>();
+        <span class="kw">let</span> <span class="ident">dalek</span> <span class="op">=</span> <span class="ident">Sas::new</span>();
+
+        <span class="ident">olm</span>.<span class="ident">set_their_public_key</span>(<span class="ident">dalek</span>.<span class="ident">public_key_encoded</span>().<span class="ident">to_string</span>())
+            .<span class="ident">expect</span>(<span class="string">&quot;Couldn&#39;t set the public key for libolm&quot;</span>);
+        <span class="kw">let</span> <span class="ident">established</span> <span class="op">=</span> <span class="ident">dalek</span>.<span class="ident">diffie_hellman_with_raw</span>(<span class="kw-2">&amp;</span><span class="ident">olm</span>.<span class="ident">public_key</span>())<span class="question-mark">?</span>;
+
+        <span class="kw">let</span> <span class="ident">olm_mac</span> <span class="op">=</span> <span class="ident">olm</span>.<span class="ident">calculate_mac</span>(<span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;libolm couldn&#39;t calculate a MAC&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">olm_mac</span>, <span class="ident">established</span>.<span class="ident">calculate_mac_invalid_base64</span>(<span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>));
 
         <span class="prelude-val">Ok</span>(())
     }
@@ -856,5 +1056,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (4e8fb743c 2022-02-03)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (e7aca8959 2022-02-09)" ></div>
 </body></html>
