@@ -845,6 +845,75 @@
 <span id="840">840</span>
 <span id="841">841</span>
 <span id="842">842</span>
+<span id="843">843</span>
+<span id="844">844</span>
+<span id="845">845</span>
+<span id="846">846</span>
+<span id="847">847</span>
+<span id="848">848</span>
+<span id="849">849</span>
+<span id="850">850</span>
+<span id="851">851</span>
+<span id="852">852</span>
+<span id="853">853</span>
+<span id="854">854</span>
+<span id="855">855</span>
+<span id="856">856</span>
+<span id="857">857</span>
+<span id="858">858</span>
+<span id="859">859</span>
+<span id="860">860</span>
+<span id="861">861</span>
+<span id="862">862</span>
+<span id="863">863</span>
+<span id="864">864</span>
+<span id="865">865</span>
+<span id="866">866</span>
+<span id="867">867</span>
+<span id="868">868</span>
+<span id="869">869</span>
+<span id="870">870</span>
+<span id="871">871</span>
+<span id="872">872</span>
+<span id="873">873</span>
+<span id="874">874</span>
+<span id="875">875</span>
+<span id="876">876</span>
+<span id="877">877</span>
+<span id="878">878</span>
+<span id="879">879</span>
+<span id="880">880</span>
+<span id="881">881</span>
+<span id="882">882</span>
+<span id="883">883</span>
+<span id="884">884</span>
+<span id="885">885</span>
+<span id="886">886</span>
+<span id="887">887</span>
+<span id="888">888</span>
+<span id="889">889</span>
+<span id="890">890</span>
+<span id="891">891</span>
+<span id="892">892</span>
+<span id="893">893</span>
+<span id="894">894</span>
+<span id="895">895</span>
+<span id="896">896</span>
+<span id="897">897</span>
+<span id="898">898</span>
+<span id="899">899</span>
+<span id="900">900</span>
+<span id="901">901</span>
+<span id="902">902</span>
+<span id="903">903</span>
+<span id="904">904</span>
+<span id="905">905</span>
+<span id="906">906</span>
+<span id="907">907</span>
+<span id="908">908</span>
+<span id="909">909</span>
+<span id="910">910</span>
+<span id="911">911</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Damir Jelić, Denis Kasak</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -862,11 +931,7 @@
 <span class="kw">mod</span> <span class="ident">fallback_keys</span>;
 <span class="kw">mod</span> <span class="ident">one_time_keys</span>;
 
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">collections::HashMap</span>,
-    <span class="ident">io</span>::{<span class="ident">Cursor</span>, <span class="ident">Read</span>, <span class="ident">Seek</span>, <span class="ident">SeekFrom</span>},
-    <span class="ident">ops::Deref</span>,
-};
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">ops::Deref</span>};
 
 <span class="kw">use</span> <span class="ident">rand::thread_rng</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
@@ -875,7 +940,7 @@
 <span class="kw">use</span> <span class="ident">zeroize::Zeroize</span>;
 
 <span class="kw">use</span> <span class="self">self</span>::{
-    <span class="ident">fallback_keys</span>::{<span class="ident">FallbackKey</span>, <span class="ident">FallbackKeys</span>, <span class="ident">FallbackKeysPickle</span>},
+    <span class="ident">fallback_keys</span>::{<span class="ident">FallbackKeys</span>, <span class="ident">FallbackKeysPickle</span>},
     <span class="ident">one_time_keys</span>::{<span class="ident">OneTimeKeys</span>, <span class="ident">OneTimeKeysPickle</span>},
 };
 <span class="kw">use</span> <span class="kw">super</span>::{
@@ -889,7 +954,7 @@
         <span class="ident">Curve25519Keypair</span>, <span class="ident">Curve25519KeypairPickle</span>, <span class="ident">Curve25519PublicKey</span>, <span class="ident">Ed25519Keypair</span>,
         <span class="ident">Ed25519KeypairPickle</span>, <span class="ident">Ed25519KeypairUnpicklingError</span>, <span class="ident">Ed25519PublicKey</span>, <span class="ident">KeyId</span>,
     },
-    <span class="ident">utilities</span>::{<span class="ident">base64_decode</span>, <span class="ident">base64_encode</span>},
+    <span class="ident">utilities::base64_encode</span>,
     <span class="ident">DecodeError</span>,
 };
 
@@ -907,6 +972,15 @@
     <span class="ident">MismatchedIdentityKey</span>,
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The message that was used to establish the Session couldn&#39;t be decrypted&quot;</span>)]</span>
     <span class="ident">Decryption</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">DecryptionError</span>),
+}
+
+<span class="doccomment">/// Struct holding the two public identity keys of an [`Account`].</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IdentityKeys</span> {
+    <span class="doccomment">/// The ed25519 key, used for signing.</span>
+    <span class="kw">pub</span> <span class="ident">ed25519</span>: <span class="ident">Ed25519PublicKey</span>,
+    <span class="doccomment">/// The curve25519 key, used for to establish shared secrets.</span>
+    <span class="kw">pub</span> <span class="ident">curve25519</span>: <span class="ident">Curve25519PublicKey</span>,
 }
 
 <span class="doccomment">/// Return type for the creation of inbound [`Session`] objects.</span>
@@ -945,6 +1019,11 @@
             <span class="ident">one_time_keys</span>: <span class="ident">OneTimeKeys::new</span>(),
             <span class="ident">fallback_keys</span>: <span class="ident">FallbackKeys::new</span>(),
         }
+    }
+
+    <span class="doccomment">/// Get the IdentityKeys of this Account</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">identity_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">IdentityKeys</span> {
+        <span class="ident">IdentityKeys</span> { <span class="ident">ed25519</span>: <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">ed25519_key</span>(), <span class="ident">curve25519</span>: <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">curve25519_key</span>() }
     }
 
     <span class="doccomment">/// Get a reference to the account&#39;s public Ed25519 key</span>
@@ -1192,106 +1271,163 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Such pickles are encrypted and need to first be decrypted using</span>
     <span class="doccomment">/// `pickle_key`.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;libolm-compat&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_libolm_pickle</span>(
         <span class="ident">pickle</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">pickle_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="kw">crate</span>::LibolmUnpickleError</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="kw">crate</span>::{
-            <span class="ident">cipher::Cipher</span>,
-            <span class="ident">utilities</span>::{<span class="ident">read_bool</span>, <span class="ident">read_curve_key</span>, <span class="ident">read_u32</span>},
-        };
+        <span class="kw">use</span> <span class="ident"><span class="self">self</span>::fallback_keys::FallbackKey</span>;
+        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utilities</span>::{<span class="ident">unpickle_libolm</span>, <span class="ident">Decode</span>};
 
-        <span class="kw">const</span> <span class="ident">PICKLE_VERSION</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">4</span>;
+        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Zeroize</span>)]</span>
+        <span class="attribute">#[<span class="ident">zeroize</span>(<span class="ident">drop</span>)]</span>
+        <span class="kw">struct</span> <span class="ident">OneTimeKey</span> {
+            <span class="ident">key_id</span>: <span class="ident">u32</span>,
+            <span class="ident">published</span>: <span class="ident">bool</span>,
+            <span class="ident">public_key</span>: [<span class="ident">u8</span>; <span class="number">32</span>],
+            <span class="ident">private_key</span>: [<span class="ident">u8</span>; <span class="number">32</span>],
+        }
 
-        <span class="kw">let</span> <span class="ident">cipher</span> <span class="op">=</span> <span class="ident">Cipher::new_pickle</span>(<span class="ident">pickle_key</span>.<span class="ident">as_ref</span>());
-        <span class="kw">let</span> <span class="ident">decoded</span> <span class="op">=</span> <span class="ident">base64_decode</span>(<span class="ident">pickle</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">decrypted</span> <span class="op">=</span> <span class="ident">cipher</span>.<span class="ident">decrypt_pickle</span>(<span class="kw-2">&amp;</span><span class="ident">decoded</span>)<span class="question-mark">?</span>;
+        <span class="kw">impl</span> <span class="ident">Decode</span> <span class="kw">for</span> <span class="ident">OneTimeKey</span> {
+            <span class="kw">fn</span> <span class="ident">decode</span>(
+                <span class="ident">reader</span>: <span class="kw-2">&amp;mut</span> <span class="kw">impl</span> <span class="ident">std::io::Read</span>,
+            ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="kw">crate</span>::utilities::LibolmDecodeError</span><span class="op">&gt;</span> {
+                <span class="kw">let</span> <span class="ident">key_id</span> <span class="op">=</span> <span class="ident">u32::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">published</span> <span class="op">=</span> <span class="ident">bool::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">public_key</span> <span class="op">=</span> <span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span><span class="ident">::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">private_key</span> <span class="op">=</span> <span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span><span class="ident">::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">Cursor::new</span>(<span class="ident">decrypted</span>);
-        <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="ident">read_u32</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>)<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(<span class="self">Self</span> { <span class="ident">key_id</span>, <span class="ident">published</span>, <span class="ident">public_key</span>, <span class="ident">private_key</span> })
+            }
+        }
 
-        <span class="kw">if</span> <span class="ident">version</span> <span class="op">!</span><span class="op">=</span> <span class="ident">PICKLE_VERSION</span> {
-            <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::LibolmUnpickleError::Version</span>(<span class="ident">PICKLE_VERSION</span>, <span class="ident">version</span>))
-        } <span class="kw">else</span> {
-            <span class="comment">// We skip the public ed25519 key, we&#39;ll create it from the private</span>
-            <span class="comment">// key.</span>
-            <span class="ident">cursor</span>.<span class="ident">seek</span>(<span class="ident">SeekFrom::Current</span>(<span class="number">32</span>))<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">private_key</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">64</span>];
-            <span class="ident">cursor</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">private_key</span>)<span class="question-mark">?</span>;
-
-            <span class="kw">let</span> <span class="ident">signing_key</span> <span class="op">=</span> <span class="ident">Ed25519Keypair::from_expanded_key</span>(<span class="kw-2">&amp;</span><span class="ident">private_key</span>)<span class="question-mark">?</span>;
-            <span class="ident">private_key</span>.<span class="ident">zeroize</span>();
-
-            <span class="kw">let</span> <span class="ident">secret_key</span> <span class="op">=</span> <span class="ident">read_curve_key</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">public_key</span> <span class="op">=</span> <span class="ident">Curve25519PublicKey::from</span>(<span class="kw-2">&amp;</span><span class="ident">secret_key</span>);
-
-            <span class="kw">let</span> <span class="ident">diffie_hellman_key</span> <span class="op">=</span> <span class="ident">Curve25519Keypair</span> {
-                <span class="ident">secret_key</span>,
-                <span class="ident">public_key</span>,
-                <span class="ident">encoded_public_key</span>: <span class="ident">public_key</span>.<span class="ident">to_base64</span>(),
-            };
-
-            <span class="kw">let</span> <span class="ident">number_of_one_time_keys</span> <span class="op">=</span> <span class="ident">read_u32</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>)<span class="question-mark">?</span>;
-
-            <span class="kw">let</span> <span class="ident">unpickle_curve_key</span> <span class="op">=</span> <span class="op">|</span><span class="ident">cursor</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">|</span> -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>
-                (<span class="ident">KeyId</span>, <span class="ident">bool</span>, <span class="ident">Curve25519SecretKey</span>),
-                <span class="ident"><span class="kw">crate</span>::LibolmUnpickleError</span>,
-            <span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="ident">key_id</span> <span class="op">=</span> <span class="ident">KeyId</span>(<span class="ident">read_u32</span>(<span class="ident">cursor</span>)<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">u64</span>);
-                <span class="kw">let</span> <span class="ident">published</span> <span class="op">=</span> <span class="ident">read_bool</span>(<span class="ident">cursor</span>)<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">private_key</span> <span class="op">=</span> <span class="ident">read_curve_key</span>(<span class="ident">cursor</span>)<span class="question-mark">?</span>;
-
-                <span class="prelude-val">Ok</span>((<span class="ident">key_id</span>, <span class="ident">published</span>, <span class="ident">private_key</span>))
-            };
-
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">one_time_keys</span> <span class="op">=</span> <span class="ident">OneTimeKeys::new</span>();
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">max_key_id</span> <span class="op">=</span> <span class="number">0</span>;
-
-            <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">number_of_one_time_keys</span> {
-                <span class="kw">let</span> (<span class="ident">key_id</span>, <span class="ident">published</span>, <span class="ident">key</span>) <span class="op">=</span> <span class="ident">unpickle_curve_key</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>)<span class="question-mark">?</span>;
-                <span class="ident">one_time_keys</span>.<span class="ident">insert_secret_key</span>(<span class="ident">key_id</span>, <span class="ident">key</span>, <span class="ident">published</span>);
-
-                <span class="kw">if</span> <span class="ident">key_id</span>.<span class="number">0</span> <span class="op">&gt;</span> <span class="ident">max_key_id</span> {
-                    <span class="ident">max_key_id</span> <span class="op">=</span> <span class="ident">key_id</span>.<span class="number">0</span>;
+        <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">OneTimeKey</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FallbackKey</span> {
+            <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">OneTimeKey</span>) -&gt; <span class="self">Self</span> {
+                <span class="ident">FallbackKey</span> {
+                    <span class="ident">key_id</span>: <span class="ident">KeyId</span>(<span class="ident">key</span>.<span class="ident">key_id</span>.<span class="ident">into</span>()),
+                    <span class="ident">key</span>: <span class="ident">Curve25519SecretKey::from</span>(<span class="ident">key</span>.<span class="ident">private_key</span>),
+                    <span class="ident">published</span>: <span class="ident">key</span>.<span class="ident">published</span>,
                 }
             }
-
-            <span class="comment">// If there are no one-time keys in the pickle our key id will be 0,</span>
-            <span class="comment">// otherwise we&#39;ll have to use the max found key id and increment</span>
-            <span class="comment">// it.</span>
-            <span class="ident">one_time_keys</span>.<span class="ident">key_id</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">number_of_one_time_keys</span> <span class="op">==</span> <span class="number">0</span> { <span class="number">0</span> } <span class="kw">else</span> { <span class="ident">max_key_id</span> <span class="op">+</span> <span class="number">1</span> };
-
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">number_of_fallback_keys</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">1</span>];
-            <span class="ident">cursor</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">number_of_fallback_keys</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">number_of_fallback_keys</span> <span class="op">=</span> <span class="ident">number_of_fallback_keys</span>[<span class="number">0</span>];
-
-            <span class="kw">let</span> <span class="ident">fallback_key</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">number_of_fallback_keys</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">1</span> {
-                <span class="kw">let</span> (<span class="ident">key_id</span>, <span class="ident">published</span>, <span class="ident">key</span>) <span class="op">=</span> <span class="ident">unpickle_curve_key</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>)<span class="question-mark">?</span>;
-
-                <span class="prelude-val">Some</span>(<span class="ident">FallbackKey</span> { <span class="ident">key_id</span>, <span class="ident">key</span>, <span class="ident">published</span> })
-            } <span class="kw">else</span> {
-                <span class="prelude-val">None</span>
-            };
-
-            <span class="kw">let</span> <span class="ident">previous_fallback_key</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">number_of_fallback_keys</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">2</span> {
-                <span class="kw">let</span> (<span class="ident">key_id</span>, <span class="ident">published</span>, <span class="ident">key</span>) <span class="op">=</span> <span class="ident">unpickle_curve_key</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>)<span class="question-mark">?</span>;
-
-                <span class="prelude-val">Some</span>(<span class="ident">FallbackKey</span> { <span class="ident">key_id</span>, <span class="ident">key</span>, <span class="ident">published</span> })
-            } <span class="kw">else</span> {
-                <span class="prelude-val">None</span>
-            };
-
-            <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-                <span class="ident">signing_key</span>,
-                <span class="ident">diffie_hellman_key</span>,
-                <span class="ident">one_time_keys</span>,
-                <span class="ident">fallback_keys</span>: <span class="ident">FallbackKeys</span> {
-                    <span class="ident">key_id</span>: <span class="ident">fallback_key</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">k</span><span class="op">|</span> <span class="ident">k</span>.<span class="ident">key_id</span>().<span class="number">0</span> <span class="op">+</span> <span class="number">1</span>).<span class="ident">unwrap_or</span>(<span class="number">0</span>),
-                    <span class="ident">fallback_key</span>,
-                    <span class="ident">previous_fallback_key</span>,
-                },
-            })
         }
+
+        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Zeroize</span>)]</span>
+        <span class="attribute">#[<span class="ident">zeroize</span>(<span class="ident">drop</span>)]</span>
+        <span class="kw">struct</span> <span class="ident">FallbackKeysArray</span> {
+            <span class="ident">fallback_key</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OneTimeKey</span><span class="op">&gt;</span>,
+            <span class="ident">previous_fallback_key</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OneTimeKey</span><span class="op">&gt;</span>,
+        }
+
+        <span class="kw">impl</span> <span class="ident">Decode</span> <span class="kw">for</span> <span class="ident">FallbackKeysArray</span> {
+            <span class="kw">fn</span> <span class="ident">decode</span>(
+                <span class="ident">reader</span>: <span class="kw-2">&amp;mut</span> <span class="kw">impl</span> <span class="ident">std::io::Read</span>,
+            ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="kw">crate</span>::utilities::LibolmDecodeError</span><span class="op">&gt;</span> {
+                <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="ident">u8::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>;
+
+                <span class="kw">let</span> (<span class="ident">fallback_key</span>, <span class="ident">previous_fallback_key</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">count</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">1</span> {
+                    <span class="kw">let</span> <span class="ident">fallback_key</span> <span class="op">=</span> <span class="ident">OneTimeKey::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>;
+
+                    <span class="kw">let</span> <span class="ident">previous_fallback_key</span> <span class="op">=</span>
+                        <span class="kw">if</span> <span class="ident">count</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">2</span> { <span class="prelude-val">Some</span>(<span class="ident">OneTimeKey::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>) } <span class="kw">else</span> { <span class="prelude-val">None</span> };
+
+                    (<span class="prelude-val">Some</span>(<span class="ident">fallback_key</span>), <span class="ident">previous_fallback_key</span>)
+                } <span class="kw">else</span> {
+                    (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>)
+                };
+
+                <span class="prelude-val">Ok</span>(<span class="self">Self</span> { <span class="ident">fallback_key</span>, <span class="ident">previous_fallback_key</span> })
+            }
+        }
+
+        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Zeroize</span>)]</span>
+        <span class="attribute">#[<span class="ident">zeroize</span>(<span class="ident">drop</span>)]</span>
+        <span class="kw">struct</span> <span class="ident">Pickle</span> {
+            <span class="ident">version</span>: <span class="ident">u32</span>,
+            <span class="ident">public_ed25519_key</span>: [<span class="ident">u8</span>; <span class="number">32</span>],
+            <span class="ident">private_ed25519_key</span>: [<span class="ident">u8</span>; <span class="number">64</span>],
+            <span class="ident">public_curve25519_key</span>: [<span class="ident">u8</span>; <span class="number">32</span>],
+            <span class="ident">private_curve25519_key</span>: [<span class="ident">u8</span>; <span class="number">32</span>],
+            <span class="ident">one_time_keys</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OneTimeKey</span><span class="op">&gt;</span>,
+            <span class="ident">fallback_keys</span>: <span class="ident">FallbackKeysArray</span>,
+        }
+
+        <span class="kw">impl</span> <span class="ident">Decode</span> <span class="kw">for</span> <span class="ident">Pickle</span> {
+            <span class="kw">fn</span> <span class="ident">decode</span>(
+                <span class="ident">reader</span>: <span class="kw-2">&amp;mut</span> <span class="kw">impl</span> <span class="ident">std::io::Read</span>,
+            ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="kw">crate</span>::utilities::LibolmDecodeError</span><span class="op">&gt;</span> {
+                <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="ident">u32::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>;
+
+                <span class="kw">let</span> <span class="ident">public_ed25519_key</span> <span class="op">=</span> <span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span><span class="ident">::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">private_ed25519_key</span> <span class="op">=</span> <span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">64</span>]<span class="op">&gt;</span><span class="ident">::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>;
+
+                <span class="kw">let</span> <span class="ident">public_curve25519_key</span> <span class="op">=</span> <span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span><span class="ident">::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">private_curve25519_key</span> <span class="op">=</span> <span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span><span class="ident">::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">one_time_keys</span> <span class="op">=</span> <span class="ident">Vec::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">fallback_keys</span> <span class="op">=</span> <span class="ident">FallbackKeysArray::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>;
+
+                <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
+                    <span class="ident">version</span>,
+                    <span class="ident">public_ed25519_key</span>,
+                    <span class="ident">private_ed25519_key</span>,
+                    <span class="ident">public_curve25519_key</span>,
+                    <span class="ident">private_curve25519_key</span>,
+                    <span class="ident">one_time_keys</span>,
+                    <span class="ident">fallback_keys</span>,
+                })
+            }
+        }
+
+        <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">Pickle</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Account</span> {
+            <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::LibolmUnpickleError</span>;
+
+            <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">pickle</span>: <span class="ident">Pickle</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">one_time_keys</span> <span class="op">=</span> <span class="ident">OneTimeKeys::new</span>();
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">max_key_id</span> <span class="op">=</span> <span class="number">0</span>;
+
+                <span class="kw">for</span> <span class="ident">key</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">pickle</span>.<span class="ident">one_time_keys</span> {
+                    <span class="kw">let</span> <span class="ident">secret_key</span> <span class="op">=</span> <span class="ident">Curve25519SecretKey::from</span>(<span class="ident">key</span>.<span class="ident">private_key</span>);
+                    <span class="kw">let</span> <span class="ident">key_id</span> <span class="op">=</span> <span class="ident">KeyId</span>(<span class="ident">key</span>.<span class="ident">key_id</span>.<span class="ident">into</span>());
+                    <span class="ident">one_time_keys</span>.<span class="ident">insert_secret_key</span>(<span class="ident">key_id</span>, <span class="ident">secret_key</span>, <span class="ident">key</span>.<span class="ident">published</span>);
+
+                    <span class="kw">if</span> <span class="ident">key_id</span>.<span class="number">0</span> <span class="op">&gt;</span> <span class="ident">max_key_id</span> {
+                        <span class="ident">max_key_id</span> <span class="op">=</span> <span class="ident">key_id</span>.<span class="number">0</span>;
+                    }
+                }
+
+                <span class="comment">// If there are no one-time keys in the pickle our key id will be 0,</span>
+                <span class="comment">// otherwise we&#39;ll have to use the max found key id and increment</span>
+                <span class="comment">// it.</span>
+                <span class="ident">one_time_keys</span>.<span class="ident">key_id</span> <span class="op">=</span>
+                    <span class="kw">if</span> <span class="ident">pickle</span>.<span class="ident">one_time_keys</span>.<span class="ident">is_empty</span>() { <span class="number">0</span> } <span class="kw">else</span> { <span class="ident">max_key_id</span> <span class="op">+</span> <span class="number">1</span> };
+
+                <span class="kw">let</span> <span class="ident">fallback_keys</span> <span class="op">=</span> <span class="ident">FallbackKeys</span> {
+                    <span class="ident">key_id</span>: <span class="ident">pickle</span>
+                        .<span class="ident">fallback_keys</span>
+                        .<span class="ident">fallback_key</span>
+                        .<span class="ident">as_ref</span>()
+                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">k</span><span class="op">|</span> <span class="ident">k</span>.<span class="ident">key_id</span> <span class="op">+</span> <span class="number">1</span>)
+                        .<span class="ident">unwrap_or</span>(<span class="number">0</span>) <span class="kw">as</span> <span class="ident">u64</span>,
+                    <span class="ident">fallback_key</span>: <span class="ident">pickle</span>.<span class="ident">fallback_keys</span>.<span class="ident">fallback_key</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">k</span><span class="op">|</span> <span class="ident">k</span>.<span class="ident">into</span>()),
+                    <span class="ident">previous_fallback_key</span>: <span class="ident">pickle</span>
+                        .<span class="ident">fallback_keys</span>
+                        .<span class="ident">previous_fallback_key</span>
+                        .<span class="ident">as_ref</span>()
+                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">k</span><span class="op">|</span> <span class="ident">k</span>.<span class="ident">into</span>()),
+                };
+
+                <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
+                    <span class="ident">signing_key</span>: <span class="ident">Ed25519Keypair::from_expanded_key</span>(<span class="kw-2">&amp;</span><span class="ident">pickle</span>.<span class="ident">private_ed25519_key</span>)<span class="question-mark">?</span>,
+                    <span class="ident">diffie_hellman_key</span>: <span class="ident">Curve25519Keypair::from_secret_key</span>(
+                        <span class="ident">pickle</span>.<span class="ident">private_curve25519_key</span>,
+                    ),
+                    <span class="ident">one_time_keys</span>,
+                    <span class="ident">fallback_keys</span>,
+                })
+            }
+        }
+
+        <span class="kw">const</span> <span class="ident">PICKLE_VERSION</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">4</span>;
+        <span class="ident">unpickle_libolm</span>::<span class="op">&lt;</span><span class="ident">Pickle</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">pickle</span>, <span class="ident">pickle_key</span>, <span class="ident">PICKLE_VERSION</span>)
     }
 }
 
@@ -1373,7 +1509,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">test</span> {
     <span class="kw">use</span> <span class="ident">anyhow</span>::{<span class="ident">bail</span>, <span class="ident">Context</span>, <span class="prelude-ty">Result</span>};
-    <span class="kw">use</span> <span class="ident">olm_rs</span>::{<span class="ident">account::OlmAccount</span>, <span class="ident">session::OlmMessage</span> <span class="kw">as</span> <span class="ident">LibolmOlmMessage</span>, <span class="ident">PicklingMode</span>};
+    <span class="kw">use</span> <span class="ident">olm_rs</span>::{<span class="ident">account::OlmAccount</span>, <span class="ident">session::OlmMessage</span> <span class="kw">as</span> <span class="ident">LibolmOlmMessage</span>};
 
     <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Account</span>, <span class="ident">InboundCreationResult</span>, <span class="ident">SessionCreationError</span>};
     <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -1596,13 +1732,14 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;libolm-compat&quot;</span>)]</span>
     <span class="kw">fn</span> <span class="ident">libolm_unpickling</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">olm</span> <span class="op">=</span> <span class="ident">OlmAccount::new</span>();
         <span class="ident">olm</span>.<span class="ident">generate_one_time_keys</span>(<span class="number">10</span>);
         <span class="ident">olm</span>.<span class="ident">generate_fallback_key</span>();
 
         <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="string">&quot;DEFAULT_PICKLE_KEY&quot;</span>;
-        <span class="kw">let</span> <span class="ident">pickle</span> <span class="op">=</span> <span class="ident">olm</span>.<span class="ident">pickle</span>(<span class="ident">PicklingMode::Encrypted</span> { <span class="ident">key</span>: <span class="ident">key</span>.<span class="ident">as_bytes</span>().<span class="ident">to_vec</span>() });
+        <span class="kw">let</span> <span class="ident">pickle</span> <span class="op">=</span> <span class="ident">olm</span>.<span class="ident">pickle</span>(<span class="ident">olm_rs::PicklingMode::Encrypted</span> { <span class="ident">key</span>: <span class="ident">key</span>.<span class="ident">as_bytes</span>().<span class="ident">to_vec</span>() });
 
         <span class="kw">let</span> <span class="ident">unpickled</span> <span class="op">=</span> <span class="ident">Account::from_libolm_pickle</span>(<span class="kw-2">&amp;</span><span class="ident">pickle</span>, <span class="ident">key</span>)<span class="question-mark">?</span>;
 
@@ -1629,13 +1766,14 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;libolm-compat&quot;</span>)]</span>
     <span class="kw">fn</span> <span class="ident">signing_with_expanded_key</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">olm</span> <span class="op">=</span> <span class="ident">OlmAccount::new</span>();
         <span class="ident">olm</span>.<span class="ident">generate_one_time_keys</span>(<span class="number">10</span>);
         <span class="ident">olm</span>.<span class="ident">generate_fallback_key</span>();
 
         <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="string">&quot;DEFAULT_PICKLE_KEY&quot;</span>;
-        <span class="kw">let</span> <span class="ident">pickle</span> <span class="op">=</span> <span class="ident">olm</span>.<span class="ident">pickle</span>(<span class="ident">PicklingMode::Encrypted</span> { <span class="ident">key</span>: <span class="ident">key</span>.<span class="ident">as_bytes</span>().<span class="ident">to_vec</span>() });
+        <span class="kw">let</span> <span class="ident">pickle</span> <span class="op">=</span> <span class="ident">olm</span>.<span class="ident">pickle</span>(<span class="ident">olm_rs::PicklingMode::Encrypted</span> { <span class="ident">key</span>: <span class="ident">key</span>.<span class="ident">as_bytes</span>().<span class="ident">to_vec</span>() });
 
         <span class="kw">let</span> <span class="ident">account_with_expanded_key</span> <span class="op">=</span> <span class="ident">Account::from_libolm_pickle</span>(<span class="kw-2">&amp;</span><span class="ident">pickle</span>, <span class="ident">key</span>)<span class="question-mark">?</span>;
 
@@ -1688,5 +1826,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (e7aca8959 2022-02-09)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (e646f3d2a 2022-02-10)" ></div>
 </body></html>

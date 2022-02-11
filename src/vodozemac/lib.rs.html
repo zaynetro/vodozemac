@@ -76,6 +76,11 @@
 <span id="71">71</span>
 <span id="72">72</span>
 <span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Damir Jelić</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -112,22 +117,27 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">olm</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">sas</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">types</span>::{<span class="ident">Curve25519KeyError</span>, <span class="ident">Curve25519PublicKey</span>, <span class="ident">Ed25519PublicKey</span>, <span class="ident">SignatureError</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">types</span>::{
+    <span class="ident">Curve25519PublicKey</span>, <span class="ident">Ed25519PublicKey</span>, <span class="ident">Ed25519Signature</span>, <span class="ident">KeyId</span>, <span class="ident">PublicKeyError</span>, <span class="ident">SignatureError</span>,
+};
 
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;libolm-compat&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">thiserror::Error</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">LibolmUnpickleError</span> {
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The pickle doesn&#39;t contain a version&quot;</span>)]</span>
+    <span class="ident">MissingVersion</span>,
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The pickle uses an unsupported version, expected {0}, got {1}&quot;</span>)]</span>
     <span class="ident">Version</span>(<span class="ident">u32</span>, <span class="ident">u32</span>),
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The pickle didn&#39;t contain enough data to be decoded&quot;</span>)]</span>
-    <span class="ident">InvalidSize</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">std::io::Error</span>),
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The pickle wasn&#39;t valid base64: {0}&quot;</span>)]</span>
     <span class="ident">Base64</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">base64::DecodeError</span>),
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The pickle couldn&#39;t be decrypted: {0}&quot;</span>)]</span>
     <span class="ident">Decryption</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident"><span class="kw">crate</span>::cipher::DecryptionError</span>),
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The pickle contained an invalid ed25519 public key {0}&quot;</span>)]</span>
-    <span class="ident">PublicKey</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">SignatureError</span>),
+    <span class="ident">PublicKey</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">PublicKeyError</span>),
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The pickle didn&#39;t contain a valid Olm session&quot;</span>)]</span>
     <span class="ident">InvalidSession</span>,
+    <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
+    <span class="ident">Decode</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident"><span class="kw">crate</span>::utilities::LibolmDecodeError</span>),
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">thiserror::Error</span>)]</span>
@@ -139,7 +149,7 @@
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The message didn&#39;t have a valid version, expected {0}, got {1}&quot;</span>)]</span>
     <span class="ident">InvalidVersion</span>(<span class="ident">u8</span>, <span class="ident">u8</span>),
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The message contained an invalid public key: {0}&quot;</span>)]</span>
-    <span class="ident">InvalidKey</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">Curve25519KeyError</span>),
+    <span class="ident">InvalidKey</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">PublicKeyError</span>),
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The message contained a MAC with an invalid size, expected {0}, got {1}&quot;</span>)]</span>
     <span class="ident">InvalidMacLength</span>(<span class="ident">usize</span>, <span class="ident">usize</span>),
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The message contained an invalid Signature: {0}&quot;</span>)]</span>
@@ -150,5 +160,5 @@
     <span class="ident">Base64</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">base64::DecodeError</span>),
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (e7aca8959 2022-02-09)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (e646f3d2a 2022-02-10)" ></div>
 </body></html>

@@ -221,6 +221,28 @@
 <span id="216">216</span>
 <span id="217">217</span>
 <span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Denis Kasak, Damir Jelić</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -235,7 +257,6 @@
 <span class="comment">// See the License for the specific language governing permissions and</span>
 <span class="comment">// limitations under the License.</span>
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">ed25519_dalek::SignatureError</span>;
 <span class="kw">use</span> <span class="ident">ed25519_dalek</span>::{
     <span class="ident">ExpandedSecretKey</span>, <span class="ident">Keypair</span>, <span class="ident">PublicKey</span>, <span class="ident">SecretKey</span>, <span class="ident">Signature</span>, <span class="ident">Verifier</span>, <span class="ident">PUBLIC_KEY_LENGTH</span>,
     <span class="ident">SIGNATURE_LENGTH</span>,
@@ -245,7 +266,18 @@
 <span class="kw">use</span> <span class="ident">thiserror::Error</span>;
 <span class="kw">use</span> <span class="ident">zeroize::Zeroize</span>;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utilities::base64_encode</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utilities</span>::{<span class="ident">base64_decode</span>, <span class="ident">base64_encode</span>};
+
+<span class="doccomment">/// Error type describing signature verification failures.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Error</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SignatureError</span> {
+    <span class="doccomment">/// The signature wasn&#39;t valid base64.</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The signature couldn&#39;t be decoded: {0}&quot;</span>)]</span>
+    <span class="ident">Base64</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">base64::DecodeError</span>),
+    <span class="doccomment">/// The signature failed to be verified.</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The signature was invalid: {0}&quot;</span>)]</span>
+    <span class="ident">Signature</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">ed25519_dalek::SignatureError</span>),
+}
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">try_from</span> <span class="op">=</span> <span class="string">&quot;Ed25519KeypairPickle&quot;</span>)]</span>
@@ -269,8 +301,9 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_expanded_key</span>(<span class="ident">secret_key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">64</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">SignatureError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">secret_key</span> <span class="op">=</span> <span class="ident">ExpandedSecretKey::from_bytes</span>(<span class="ident">secret_key</span>)<span class="question-mark">?</span>;
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;libolm-compat&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_expanded_key</span>(<span class="ident">secret_key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">64</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="kw">crate</span>::PublicKeyError</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">secret_key</span> <span class="op">=</span> <span class="ident">ExpandedSecretKey::from_bytes</span>(<span class="ident">secret_key</span>).<span class="ident">map_err</span>(<span class="ident">SignatureError::from</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">public_key</span> <span class="op">=</span> <span class="ident">Ed25519PublicKey</span>(<span class="ident">PublicKey::from</span>(<span class="kw-2">&amp;</span><span class="ident">secret_key</span>));
         <span class="kw">let</span> <span class="ident">encoded_public_key</span> <span class="op">=</span> <span class="ident">base64_encode</span>(<span class="ident">public_key</span>.<span class="ident">as_bytes</span>());
 
@@ -317,19 +350,26 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Ed25519PublicKey</span>(<span class="ident">PublicKey</span>);
 
 <span class="kw">impl</span> <span class="ident">Ed25519PublicKey</span> {
     <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">LENGTH</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">PUBLIC_KEY_LENGTH</span>;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_bytes</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">SignatureError</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(<span class="ident">PublicKey::from_bytes</span>(<span class="ident">bytes</span>)<span class="question-mark">?</span>))
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_slice</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="kw">crate</span>::PublicKeyError</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(<span class="ident">PublicKey::from_bytes</span>(<span class="ident">bytes</span>).<span class="ident">map_err</span>(<span class="ident">SignatureError::from</span>)<span class="question-mark">?</span>))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="ident"><span class="self">Self</span>::LENGTH</span>] {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_bytes</span>()
+    }
+
+    <span class="doccomment">/// Instantiate a Ed25519PublicKey public key from an unpadded base64</span>
+    <span class="doccomment">/// representation.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_base64</span>(<span class="ident">base64_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="kw">crate</span>::PublicKeyError</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">base64_decode</span>(<span class="ident">base64_key</span>)<span class="question-mark">?</span>;
+        <span class="ident"><span class="self">Self</span>::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_base64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
@@ -357,9 +397,9 @@
         <span class="ident">signature</span>: <span class="kw-2">&amp;</span><span class="ident">Ed25519Signature</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">SignatureError</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;strict-signatures&quot;</span>) {
-            <span class="self">self</span>.<span class="number">0</span>.<span class="ident">verify_strict</span>(<span class="ident">message</span>, <span class="kw-2">&amp;</span><span class="ident">signature</span>.<span class="number">0</span>)
+            <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">verify_strict</span>(<span class="ident">message</span>, <span class="kw-2">&amp;</span><span class="ident">signature</span>.<span class="number">0</span>)<span class="question-mark">?</span>)
         } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="number">0</span>.<span class="ident">verify</span>(<span class="ident">message</span>, <span class="kw-2">&amp;</span><span class="ident">signature</span>.<span class="number">0</span>)
+            <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">verify</span>(<span class="ident">message</span>, <span class="kw-2">&amp;</span><span class="ident">signature</span>.<span class="number">0</span>)<span class="question-mark">?</span>)
         }
     }
 }
@@ -369,8 +409,12 @@
 <span class="kw">impl</span> <span class="ident">Ed25519Signature</span> {
     <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">LENGTH</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">SIGNATURE_LENGTH</span>;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_bytes</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">SignatureError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_slice</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">SignatureError</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">Self</span>(<span class="ident">Signature::from_bytes</span>(<span class="ident">bytes</span>)<span class="question-mark">?</span>))
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_base64</span>(<span class="ident">signature</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">SignatureError</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(<span class="ident">Signature::from_bytes</span>(<span class="kw-2">&amp;</span><span class="ident">base64_decode</span>(<span class="ident">signature</span>)<span class="question-mark">?</span>)<span class="question-mark">?</span>))
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_base64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
@@ -440,5 +484,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (e7aca8959 2022-02-09)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (e646f3d2a 2022-02-10)" ></div>
 </body></html>

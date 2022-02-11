@@ -128,6 +128,9 @@
 <span id="123">123</span>
 <span id="124">124</span>
 <span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">// Copyright 2021 Damir Jelić</span>
 <span class="comment">//</span>
@@ -174,6 +177,7 @@
     <span class="ident">InvalidCiphertext</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">BlockModeError</span>),
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The MAC of the ciphertext didn&#39;t pass validation {0}&quot;</span>)]</span>
     <span class="ident">Mac</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">MacError</span>),
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The ciphertext didn&#39;t contain a valid MAC&quot;</span>)]</span>
     <span class="ident">MacMissing</span>,
 }
@@ -195,6 +199,7 @@
         <span class="self">Self</span> { <span class="ident">keys</span> }
     }
 
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;libolm-compat&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_pickle</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">keys</span> <span class="op">=</span> <span class="ident">CipherKeys::new_pickle</span>(<span class="ident">key</span>);
 
@@ -235,6 +240,7 @@
         <span class="ident">cipher</span>.<span class="ident">decrypt_vec</span>(<span class="ident">ciphertext</span>)
     }
 
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;libolm-compat&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decrypt_pickle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ciphertext</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">DecryptionError</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">ciphertext</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="ident">Mac::TRUNCATED_LEN</span> <span class="op">+</span> <span class="number">1</span> {
             <span class="prelude-val">Err</span>(<span class="ident">DecryptionError::MacMissing</span>)
@@ -254,5 +260,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (e7aca8959 2022-02-09)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (e646f3d2a 2022-02-10)" ></div>
 </body></html>

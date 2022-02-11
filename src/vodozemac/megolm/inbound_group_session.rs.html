@@ -413,6 +413,43 @@
 <span id="408">408</span>
 <span id="409">409</span>
 <span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -462,6 +499,8 @@
     <span class="ident">Base64</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">base64::DecodeError</span>),
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The signature on the session key was invalid: {0}&quot;</span>)]</span>
     <span class="ident">Signature</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">SignatureError</span>),
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The public key of session was invalid: {0}&quot;</span>)]</span>
+    <span class="ident">PublicKey</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident"><span class="kw">crate</span>::PublicKeyError</span>),
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Error</span>)]</span>
@@ -497,7 +536,8 @@
     <span class="kw">pub</span> <span class="ident">message_index</span>: <span class="ident">u32</span>,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Zeroize</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Zeroize</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
+<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ExportedSessionKey</span>(<span class="kw">pub</span> <span class="ident">String</span>);
 
 <span class="kw">impl</span> <span class="ident">ExportedSessionKey</span> {
@@ -542,13 +582,13 @@
             <span class="ident">cursor</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ratchet</span>)<span class="question-mark">?</span>;
             <span class="ident">cursor</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">public_key</span>)<span class="question-mark">?</span>;
 
-            <span class="kw">let</span> <span class="ident">signing_key</span> <span class="op">=</span> <span class="ident">Ed25519PublicKey::from_bytes</span>(<span class="kw-2">&amp;</span><span class="ident">public_key</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">signing_key</span> <span class="op">=</span> <span class="ident">Ed25519PublicKey::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">public_key</span>)<span class="question-mark">?</span>;
 
             <span class="kw">let</span> <span class="ident">signing_key_verified</span> <span class="op">=</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">is_export</span> {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">signature</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="ident">Ed25519Signature::LENGTH</span>];
 
                 <span class="ident">cursor</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">signature</span>)<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">signature</span> <span class="op">=</span> <span class="ident">Ed25519Signature::from_bytes</span>(<span class="kw-2">&amp;</span><span class="ident">signature</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">signature</span> <span class="op">=</span> <span class="ident">Ed25519Signature::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">signature</span>)<span class="question-mark">?</span>;
 
                 <span class="kw">let</span> <span class="ident">decoded</span> <span class="op">=</span> <span class="ident">cursor</span>.<span class="ident">into_inner</span>();
 
@@ -679,43 +719,77 @@
         }
     }
 
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;libolm-compat&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_libolm_pickle</span>(
         <span class="ident">pickle</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">pickle_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="kw">crate</span>::LibolmUnpickleError</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utilities</span>::{<span class="ident">read_bool</span>, <span class="ident">read_u32</span>};
+        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utilities</span>::{<span class="ident">unpickle_libolm</span>, <span class="ident">Decode</span>};
+
+        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Zeroize</span>)]</span>
+        <span class="attribute">#[<span class="ident">zeroize</span>(<span class="ident">drop</span>)]</span>
+        <span class="kw">struct</span> <span class="ident">RatchetPickle</span> {
+            <span class="ident">ratchet</span>: [<span class="ident">u8</span>; <span class="number">128</span>],
+            <span class="ident">index</span>: <span class="ident">u32</span>,
+        }
+
+        <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">RatchetPickle</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Ratchet</span> {
+            <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">pickle</span>: <span class="kw-2">&amp;</span><span class="ident">RatchetPickle</span>) -&gt; <span class="self">Self</span> {
+                <span class="ident">Ratchet::from_bytes</span>(<span class="ident">pickle</span>.<span class="ident">ratchet</span>, <span class="ident">pickle</span>.<span class="ident">index</span>)
+            }
+        }
+
+        <span class="kw">impl</span> <span class="ident">Decode</span> <span class="kw">for</span> <span class="ident">RatchetPickle</span> {
+            <span class="kw">fn</span> <span class="ident">decode</span>(<span class="ident">reader</span>: <span class="kw-2">&amp;mut</span> <span class="kw">impl</span> <span class="ident">Read</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="kw">crate</span>::utilities::LibolmDecodeError</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident">RatchetPickle</span> {
+                    <span class="ident">ratchet</span>: <span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">128</span>]<span class="op">&gt;</span><span class="ident">::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>,
+                    <span class="ident">index</span>: <span class="ident">u32::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>,
+                })
+            }
+        }
+
+        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Zeroize</span>)]</span>
+        <span class="attribute">#[<span class="ident">zeroize</span>(<span class="ident">drop</span>)]</span>
+        <span class="kw">struct</span> <span class="ident">Pickle</span> {
+            <span class="ident">version</span>: <span class="ident">u32</span>,
+            <span class="ident">initial_ratchet</span>: <span class="ident">RatchetPickle</span>,
+            <span class="ident">latest_ratchet</span>: <span class="ident">RatchetPickle</span>,
+            <span class="ident">signing_key</span>: [<span class="ident">u8</span>; <span class="number">32</span>],
+            <span class="ident">signing_key_verified</span>: <span class="ident">bool</span>,
+        }
+
+        <span class="kw">impl</span> <span class="ident">Decode</span> <span class="kw">for</span> <span class="ident">Pickle</span> {
+            <span class="kw">fn</span> <span class="ident">decode</span>(<span class="ident">reader</span>: <span class="kw-2">&amp;mut</span> <span class="kw">impl</span> <span class="ident">Read</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="kw">crate</span>::utilities::LibolmDecodeError</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident">Pickle</span> {
+                    <span class="ident">version</span>: <span class="ident">u32::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>,
+                    <span class="ident">initial_ratchet</span>: <span class="ident">RatchetPickle::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>,
+                    <span class="ident">latest_ratchet</span>: <span class="ident">RatchetPickle::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>,
+                    <span class="ident">signing_key</span>: <span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span><span class="ident">::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>,
+                    <span class="ident">signing_key_verified</span>: <span class="ident">bool::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>,
+                })
+            }
+        }
+
+        <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">Pickle</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">InboundGroupSession</span> {
+            <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::LibolmUnpickleError</span>;
+
+            <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">pickle</span>: <span class="ident">Pickle</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+                <span class="comment">// Removing the borrow doesn&#39;t work and clippy complains about</span>
+                <span class="comment">// this on nightly.</span>
+                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::needless_borrow</span>)]</span>
+                <span class="kw">let</span> <span class="ident">initial_ratchet</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="ident">pickle</span>.<span class="ident">initial_ratchet</span>).<span class="ident">into</span>();
+                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::needless_borrow</span>)]</span>
+                <span class="kw">let</span> <span class="ident">latest_ratchet</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="ident">pickle</span>.<span class="ident">latest_ratchet</span>).<span class="ident">into</span>();
+                <span class="kw">let</span> <span class="ident">signing_key</span> <span class="op">=</span> <span class="ident">Ed25519PublicKey::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">pickle</span>.<span class="ident">signing_key</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">signing_key_verified</span> <span class="op">=</span> <span class="ident">pickle</span>.<span class="ident">signing_key_verified</span>;
+
+                <span class="prelude-val">Ok</span>(<span class="self">Self</span> { <span class="ident">initial_ratchet</span>, <span class="ident">latest_ratchet</span>, <span class="ident">signing_key</span>, <span class="ident">signing_key_verified</span> })
+            }
+        }
 
         <span class="kw">const</span> <span class="ident">PICKLE_VERSION</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">2</span>;
 
-        <span class="kw">let</span> <span class="ident">cipher</span> <span class="op">=</span> <span class="ident">Cipher::new_pickle</span>(<span class="ident">pickle_key</span>.<span class="ident">as_ref</span>());
-
-        <span class="kw">let</span> <span class="ident">decoded</span> <span class="op">=</span> <span class="ident">base64_decode</span>(<span class="ident">pickle</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">decrypted</span> <span class="op">=</span> <span class="ident">cipher</span>.<span class="ident">decrypt_pickle</span>(<span class="kw-2">&amp;</span><span class="ident">decoded</span>)<span class="question-mark">?</span>;
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">Cursor::new</span>(<span class="ident">decrypted</span>);
-        <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="ident">read_u32</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>)<span class="question-mark">?</span>;
-
-        <span class="kw">if</span> <span class="ident">version</span> <span class="op">!</span><span class="op">=</span> <span class="number">2</span> {
-            <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::LibolmUnpickleError::Version</span>(<span class="ident">PICKLE_VERSION</span>, <span class="ident">version</span>))
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ratchet</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="ident">Ratchet::RATCHET_LENGTH</span>];
-
-            <span class="ident">cursor</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ratchet</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">counter</span> <span class="op">=</span> <span class="ident">read_u32</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">initial_ratchet</span> <span class="op">=</span> <span class="ident">Ratchet::from_bytes</span>(<span class="ident">ratchet</span>, <span class="ident">counter</span>);
-
-            <span class="ident">cursor</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ratchet</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">counter</span> <span class="op">=</span> <span class="ident">read_u32</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">latest_ratchet</span> <span class="op">=</span> <span class="ident">Ratchet::from_bytes</span>(<span class="ident">ratchet</span>, <span class="ident">counter</span>);
-
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">signing_key</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="ident">Ed25519PublicKey::LENGTH</span>];
-            <span class="ident">cursor</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">signing_key</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">signing_key</span> <span class="op">=</span> <span class="ident">Ed25519PublicKey::from_bytes</span>(<span class="kw-2">&amp;</span><span class="ident">signing_key</span>)<span class="question-mark">?</span>;
-
-            <span class="kw">let</span> <span class="ident">signing_key_verified</span> <span class="op">=</span> <span class="ident">read_bool</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>)<span class="question-mark">?</span>;
-
-            <span class="prelude-val">Ok</span>(<span class="self">Self</span> { <span class="ident">initial_ratchet</span>, <span class="ident">latest_ratchet</span>, <span class="ident">signing_key</span>, <span class="ident">signing_key_verified</span> })
-        }
+        <span class="ident">unpickle_libolm</span>::<span class="op">&lt;</span><span class="ident">Pickle</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">pickle</span>, <span class="ident">pickle_key</span>, <span class="ident">PICKLE_VERSION</span>)
     }
 }
 
@@ -824,5 +898,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (e7aca8959 2022-02-09)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (e646f3d2a 2022-02-10)" ></div>
 </body></html>

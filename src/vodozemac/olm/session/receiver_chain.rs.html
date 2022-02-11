@@ -138,6 +138,8 @@
 <span id="133">133</span>
 <span id="134">134</span>
 <span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Damir Jelić, Denis Kasak</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -261,10 +263,12 @@
         }
     }
 
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;libolm-compat&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ratchet_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RemoteRatchetKey</span> {
         <span class="self">self</span>.<span class="ident">ratchet_key</span>
     }
 
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;libolm-compat&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert_message_key</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">message_key</span>: <span class="ident">RemoteMessageKey</span>) {
         <span class="self">self</span>.<span class="ident">skipped_message_keys</span>.<span class="ident">push</span>(<span class="ident">message_key</span>)
     }
@@ -274,5 +278,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (e7aca8959 2022-02-09)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (e646f3d2a 2022-02-10)" ></div>
 </body></html>

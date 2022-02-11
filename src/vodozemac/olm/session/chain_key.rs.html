@@ -128,6 +128,8 @@
 <span id="123">123</span>
 <span id="124">124</span>
 <span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Damir Jelić</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -209,6 +211,7 @@
         <span class="self">self</span>.<span class="ident">index</span>
     }
 
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;libolm-compat&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_bytes_and_index</span>(<span class="ident">bytes</span>: [<span class="ident">u8</span>; <span class="number">32</span>], <span class="ident">index</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">key</span>: <span class="ident">bytes</span>, <span class="ident">index</span>: <span class="ident">index</span>.<span class="ident">into</span>() }
     }
@@ -234,6 +237,7 @@
         <span class="self">Self</span> { <span class="ident">key</span>: <span class="ident">bytes</span>, <span class="ident">index</span>: <span class="number">0</span> }
     }
 
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;libolm-compat&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_bytes_and_index</span>(<span class="ident">bytes</span>: [<span class="ident">u8</span>; <span class="number">32</span>], <span class="ident">index</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">key</span>: <span class="ident">bytes</span>, <span class="ident">index</span>: <span class="ident">index</span>.<span class="ident">into</span>() }
     }
@@ -254,5 +258,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (e7aca8959 2022-02-09)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (e646f3d2a 2022-02-10)" ></div>
 </body></html>

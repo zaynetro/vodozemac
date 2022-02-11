@@ -164,6 +164,7 @@
 <span id="159">159</span>
 <span id="160">160</span>
 <span id="161">161</span>
+<span id="162">162</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Damir Jelić</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -223,6 +224,7 @@
         <span class="self">Self</span> { <span class="ident">inner</span>: <span class="ident">ratchet</span>.<span class="ident">into</span>() }
     }
 
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;libolm-compat&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_ratchet_and_chain_key</span>(<span class="ident">ratchet</span>: <span class="ident">Ratchet</span>, <span class="ident">chain_key</span>: <span class="ident">ChainKey</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">inner</span>: <span class="ident">ActiveDoubleRatchet</span> {
@@ -326,5 +328,5 @@
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">type</span> <span class="ident">DoubleRatchetPickle</span> <span class="op">=</span> <span class="ident">DoubleRatchet</span>;
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (e7aca8959 2022-02-09)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (e646f3d2a 2022-02-10)" ></div>
 </body></html>
