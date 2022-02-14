@@ -83,7 +83,7 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">curve25519::Curve25519SecretKey</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">curve25519</span>::{<span class="ident">Curve25519Keypair</span>, <span class="ident">Curve25519KeypairPickle</span>};
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">ed25519</span>::{<span class="ident">Ed25519Keypair</span>, <span class="ident">Ed25519KeypairPickle</span>, <span class="ident">Ed25519KeypairUnpicklingError</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">ed25519</span>::{<span class="ident">Ed25519PublicKey</span>, <span class="ident">Ed25519Signature</span>, <span class="ident">SignatureError</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">ed25519</span>::{<span class="ident">Ed25519PublicKey</span>, <span class="ident">Ed25519SecretKey</span>, <span class="ident">Ed25519Signature</span>, <span class="ident">SignatureError</span>};
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">thiserror::Error</span>;
 
@@ -103,9 +103,9 @@
 }
 
 <span class="doccomment">/// Error type describing failures that can happen when we try decode or use a</span>
-<span class="doccomment">/// public key.</span>
+<span class="doccomment">/// cryptographic key.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Error</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">PublicKeyError</span> {
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">KeyError</span> {
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Failed decoding a public key from base64: {}&quot;</span>, .<span class="number">0</span>)]</span>
     <span class="ident">Base64Error</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">base64::DecodeError</span>),
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Failed decoding curve25519 key from base64: \

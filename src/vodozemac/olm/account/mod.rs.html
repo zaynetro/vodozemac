@@ -1023,11 +1023,11 @@
 
     <span class="doccomment">/// Get the IdentityKeys of this Account</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">identity_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">IdentityKeys</span> {
-        <span class="ident">IdentityKeys</span> { <span class="ident">ed25519</span>: <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">ed25519_key</span>(), <span class="ident">curve25519</span>: <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">curve25519_key</span>() }
+        <span class="ident">IdentityKeys</span> { <span class="ident">ed25519</span>: <span class="self">self</span>.<span class="ident">ed25519_key</span>(), <span class="ident">curve25519</span>: <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">curve25519_key</span>() }
     }
 
     <span class="doccomment">/// Get a reference to the account&#39;s public Ed25519 key</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ed25519_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Ed25519PublicKey</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ed25519_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Ed25519PublicKey</span> {
         <span class="self">self</span>.<span class="ident">signing_key</span>.<span class="ident">public_key</span>()
     }
 

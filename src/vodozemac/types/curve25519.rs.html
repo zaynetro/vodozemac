@@ -253,7 +253,7 @@
 <span class="kw">use</span> <span class="ident">x25519_dalek</span>::{<span class="ident">EphemeralSecret</span>, <span class="ident">PublicKey</span>, <span class="ident">ReusableSecret</span>};
 <span class="kw">use</span> <span class="ident">zeroize::Zeroize</span>;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::PublicKeyError</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::KeyError</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utilities</span>::{<span class="ident">base64_decode</span>, <span class="ident">base64_encode</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Clone</span>)]</span>
@@ -342,13 +342,13 @@
 
     <span class="doccomment">/// Instantiate a Curve25519 public key from an unpadded base64</span>
     <span class="doccomment">/// representation.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_base64</span>(<span class="ident">base64_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Curve25519PublicKey</span>, <span class="ident">PublicKeyError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_base64</span>(<span class="ident">base64_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Curve25519PublicKey</span>, <span class="ident">KeyError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">base64_decode</span>(<span class="ident">base64_key</span>)<span class="question-mark">?</span>;
         <span class="ident"><span class="self">Self</span>::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>)
     }
 
     <span class="doccomment">/// Try to create a `Curve25519PublicKey` from a slice of bytes.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_slice</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Curve25519PublicKey</span>, <span class="ident">PublicKeyError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_slice</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Curve25519PublicKey</span>, <span class="ident">KeyError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">key_len</span> <span class="op">=</span> <span class="ident">slice</span>.<span class="ident">len</span>();
 
         <span class="kw">if</span> <span class="ident">key_len</span> <span class="op">==</span> <span class="ident"><span class="self">Self</span>::LENGTH</span> {
@@ -357,7 +357,7 @@
 
             <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::from</span>(<span class="ident">key</span>))
         } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">PublicKeyError::InvalidKeyLength</span>(<span class="ident">key_len</span>))
+            <span class="prelude-val">Err</span>(<span class="ident">KeyError::InvalidKeyLength</span>(<span class="ident">key_len</span>))
         }
     }
 
@@ -425,26 +425,26 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Curve25519PublicKey</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">utilities::DecodeError</span>, <span class="ident">PublicKeyError</span>};
+    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">utilities::DecodeError</span>, <span class="ident">KeyError</span>};
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">decoding_invalid_base64_fails</span>() {
         <span class="kw">let</span> <span class="ident">base64_payload</span> <span class="op">=</span> <span class="string">&quot;a&quot;</span>;
         <span class="macro">assert!</span>(<span class="macro">matches!</span>(
             <span class="ident">Curve25519PublicKey::from_base64</span>(<span class="ident">base64_payload</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">PublicKeyError::Base64Error</span>(<span class="ident">DecodeError::InvalidLength</span>))
+            <span class="prelude-val">Err</span>(<span class="ident">KeyError::Base64Error</span>(<span class="ident">DecodeError::InvalidLength</span>))
         ));
 
         <span class="kw">let</span> <span class="ident">base64_payload</span> <span class="op">=</span> <span class="string">&quot;a &quot;</span>;
         <span class="macro">assert!</span>(<span class="macro">matches!</span>(
             <span class="ident">Curve25519PublicKey::from_base64</span>(<span class="ident">base64_payload</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">PublicKeyError::Base64Error</span>(<span class="ident">DecodeError::InvalidByte</span>(..)))
+            <span class="prelude-val">Err</span>(<span class="ident">KeyError::Base64Error</span>(<span class="ident">DecodeError::InvalidByte</span>(..)))
         ));
 
         <span class="kw">let</span> <span class="ident">base64_payload</span> <span class="op">=</span> <span class="string">&quot;aZ&quot;</span>;
         <span class="macro">assert!</span>(<span class="macro">matches!</span>(
             <span class="ident">Curve25519PublicKey::from_base64</span>(<span class="ident">base64_payload</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">PublicKeyError::Base64Error</span>(<span class="ident">DecodeError::InvalidLastSymbol</span>(..)))
+            <span class="prelude-val">Err</span>(<span class="ident">KeyError::Base64Error</span>(<span class="ident">DecodeError::InvalidLastSymbol</span>(..)))
         ));
     }
 
@@ -453,7 +453,7 @@
         <span class="kw">let</span> <span class="ident">base64_payload</span> <span class="op">=</span> <span class="string">&quot;aaaa&quot;</span>;
         <span class="macro">assert!</span>(<span class="macro">matches!</span>(
             <span class="ident">Curve25519PublicKey::from_base64</span>(<span class="ident">base64_payload</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">PublicKeyError::InvalidKeyLength</span>(..))
+            <span class="prelude-val">Err</span>(<span class="ident">KeyError::InvalidKeyLength</span>(..))
         ));
     }
 
