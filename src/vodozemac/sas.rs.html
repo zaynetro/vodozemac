@@ -530,6 +530,10 @@
 <span id="525">525</span>
 <span id="526">526</span>
 <span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Damir Jelić, Denis Kasak</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -869,19 +873,22 @@
         <span class="kw">let</span> <span class="ident">mac</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">calculate_mac</span>(<span class="ident">input</span>, <span class="ident">info</span>);
 
         <span class="comment">// Since the input buffer is reused as an output buffer, and base64</span>
-        <span class="comment">// operates on 3 input bytes to generate 4 output bytes the input</span>
+        <span class="comment">// operates on 3 input bytes to generate 4 output bytes, the input</span>
         <span class="comment">// buffer gets overrun by the output.</span>
         <span class="comment">//</span>
         <span class="comment">// Only 6 bytes of the MAC get to be used before the output overwrites</span>
         <span class="comment">// the input.</span>
 
-        <span class="comment">// For the first pass all three bytes from the MAC are used.</span>
+        <span class="comment">// All three bytes of the first input chunk are used successfully.</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">base64_encode</span>(<span class="kw-2">&amp;</span><span class="ident">mac</span>.<span class="ident">as_bytes</span>()[<span class="number">0</span>..<span class="number">3</span>]);
 
-        <span class="comment">// Next up, we&#39;re using increasingly more output from the previous</span>
-        <span class="comment">// output, the MAC is used for two iterations here.</span>
+        <span class="comment">// For the next input chunk, only two bytes are sourced from the actual</span>
+        <span class="comment">// MAC, since the first byte gets overwritten by the output.</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes_from_mac</span> <span class="op">=</span> <span class="number">2</span>;
 
+        <span class="comment">// Subsequent input chunks get progressively more overwritten by the</span>
+        <span class="comment">// output, so that after two iterations, none of the original input</span>
+        <span class="comment">// bytes remain.</span>
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> (<span class="number">6</span>..<span class="number">10</span>).<span class="ident">step_by</span>(<span class="number">3</span>) {
             <span class="kw">let</span> <span class="ident">from_mac</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">mac</span>.<span class="ident">as_bytes</span>()[<span class="ident">i</span> <span class="op">-</span> <span class="ident">bytes_from_mac</span>..<span class="ident">i</span>];
             <span class="kw">let</span> <span class="ident">from_out</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">out</span>.<span class="ident">as_bytes</span>()[<span class="ident">out</span>.<span class="ident">len</span>() <span class="op">-</span> (<span class="number">3</span> <span class="op">-</span> <span class="ident">bytes_from_mac</span>)..];
@@ -893,8 +900,9 @@
             <span class="ident">out</span> <span class="op">=</span> <span class="ident">out</span> <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">encoded</span>;
         }
 
-        <span class="comment">// Now only the previous output gets used. The MAC has a size of 32, so</span>
-        <span class="comment">// we abort before we get to the remainder calculation.</span>
+        <span class="comment">// At this point, the rest of our input will be completely sourced from</span>
+        <span class="comment">// the previous output. The MAC has a size of 32, so we abort before we</span>
+        <span class="comment">// get to the remainder calculation.</span>
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> (<span class="number">9</span>..<span class="number">30</span>).<span class="ident">step_by</span>(<span class="number">3</span>) {
             <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">out</span>.<span class="ident">as_bytes</span>()[<span class="ident">i</span>..<span class="ident">i</span> <span class="op">+</span> <span class="number">3</span>];
             <span class="kw">let</span> <span class="ident">next_four</span> <span class="op">=</span> <span class="ident">base64_encode</span>(<span class="ident">next</span>);
@@ -1058,5 +1066,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (e646f3d2a 2022-02-10)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (1e12aef3f 2022-02-13)" ></div>
 </body></html>
