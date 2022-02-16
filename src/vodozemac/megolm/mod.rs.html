@@ -231,6 +231,18 @@
 <span id="226">226</span>
 <span id="227">227</span>
 <span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -387,20 +399,32 @@
 
         <span class="macro">assert_eq!</span>(<span class="ident">session</span>.<span class="ident">session_id</span>(), <span class="ident">inbound</span>.<span class="ident">session_id</span>());
 
-        <span class="kw">let</span> <span class="ident">plaintext</span> <span class="op">=</span> <span class="string">&quot;It&#39;s a secret to everybody&quot;</span>;
-        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">encrypt</span>(<span class="ident">plaintext</span>);
+        <span class="kw">let</span> <span class="ident">first_plaintext</span> <span class="op">=</span> <span class="string">&quot;It&#39;s a secret to everybody&quot;</span>;
+        <span class="kw">let</span> <span class="ident">first_message</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">encrypt</span>(<span class="ident">first_plaintext</span>);
+        <span class="kw">let</span> <span class="ident">second_plaintext</span> <span class="op">=</span> <span class="string">&quot;It&#39;s dangerous to go alone. Take this!&quot;</span>;
+        <span class="kw">let</span> <span class="ident">second_message</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">encrypt</span>(<span class="ident">second_plaintext</span>);
 
-        <span class="kw">let</span> <span class="ident">decrypted</span> <span class="op">=</span> <span class="ident">inbound</span>.<span class="ident">decrypt</span>(<span class="kw-2">&amp;</span><span class="ident">message</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">decrypted</span> <span class="op">=</span> <span class="ident">inbound</span>.<span class="ident">decrypt</span>(<span class="kw-2">&amp;</span><span class="ident">first_message</span>)<span class="question-mark">?</span>;
 
-        <span class="macro">assert_eq!</span>(<span class="ident">decrypted</span>.<span class="ident">plaintext</span>, <span class="ident">plaintext</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">decrypted</span>.<span class="ident">plaintext</span>, <span class="ident">first_plaintext</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">decrypted</span>.<span class="ident">message_index</span>, <span class="number">0</span>);
 
-        <span class="kw">let</span> <span class="ident">export</span> <span class="op">=</span> <span class="ident">inbound</span>.<span class="ident">export_at</span>(<span class="number">1</span>).<span class="ident">expect</span>(<span class="string">&quot;Can export at the initial index&quot;</span>);
+        <span class="kw">let</span> <span class="ident">export</span> <span class="op">=</span> <span class="ident">inbound</span>.<span class="ident">export_at</span>(<span class="number">1</span>).<span class="ident">expect</span>(<span class="string">&quot;Can export at the initial index.&quot;</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">imported</span> <span class="op">=</span> <span class="ident">InboundGroupSession::import</span>(<span class="kw-2">&amp;</span><span class="ident">export</span>)<span class="question-mark">?</span>;
 
         <span class="macro">assert_eq!</span>(<span class="ident">session</span>.<span class="ident">session_id</span>(), <span class="ident">imported</span>.<span class="ident">session_id</span>());
-        <span class="ident">imported</span>.<span class="ident">decrypt</span>(<span class="kw-2">&amp;</span><span class="ident">message</span>).<span class="ident">expect_err</span>(<span class="string">&quot;Can&#39;t decrypt at the initial index&quot;</span>);
-        <span class="macro">assert!</span>(<span class="ident">imported</span>.<span class="ident">export_at</span>(<span class="number">0</span>).<span class="ident">is_none</span>(), <span class="string">&quot;Can&#39;t export at the initial index&quot;</span>);
+
+        <span class="ident">imported</span>.<span class="ident">decrypt</span>(<span class="kw-2">&amp;</span><span class="ident">first_message</span>).<span class="ident">expect_err</span>(<span class="string">&quot;Can&#39;t decrypt at the initial index.&quot;</span>);
+        <span class="kw">let</span> <span class="ident">second_decrypted</span> <span class="op">=</span>
+            <span class="ident">imported</span>.<span class="ident">decrypt</span>(<span class="kw-2">&amp;</span><span class="ident">second_message</span>).<span class="ident">expect</span>(<span class="string">&quot;Can decrypt at the next index.&quot;</span>);
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">second_plaintext</span>, <span class="ident">second_decrypted</span>.<span class="ident">plaintext</span>,
+            <span class="string">&quot;Decrypted plaintext differs from original.&quot;</span>
+        );
+        <span class="macro">assert_eq!</span>(<span class="number">1</span>, <span class="ident">second_decrypted</span>.<span class="ident">message_index</span>, <span class="string">&quot;Expected message index to be 1.&quot;</span>);
+
+        <span class="macro">assert!</span>(<span class="ident">imported</span>.<span class="ident">export_at</span>(<span class="number">0</span>).<span class="ident">is_none</span>(), <span class="string">&quot;Can&#39;t export at the initial index.&quot;</span>);
+        <span class="macro">assert!</span>(<span class="ident">imported</span>.<span class="ident">export_at</span>(<span class="number">1</span>).<span class="ident">is_some</span>(), <span class="string">&quot;Can export at the next index.&quot;</span>);
 
         <span class="prelude-val">Ok</span>(())
     }
@@ -460,5 +484,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (c5c610aad 2022-02-14)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (09cb29c64 2022-02-15)" ></div>
 </body></html>
