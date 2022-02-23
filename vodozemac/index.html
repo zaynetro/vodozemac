@@ -176,11 +176,6 @@ a ratcheted state, they cannot use it to decrypt messages encrypted with an
 earlier state. This preserves forward secrecy.</p>
 <p>A detailed technical specification can be found at
 <a href="https://gitlab.matrix.org/matrix-org/olm/-/blob/master/docs/megolm.md">https://gitlab.matrix.org/matrix-org/olm/-/blob/master/docs/megolm.md</a>.</p>
-<h2 id="vendored-libraries"><a href="#vendored-libraries">Vendored libraries</a></h2>
-<p>vodozemac currently vendors <code>olm-rs</code> to provide a fixed version of the SAS MAC
-calculation method, <code>calculate_mac_fixed_base64</code>. This is used solely for
-implementing correctness tests against libolm and will be removed once the
-fixed method has been exposed in upstream <code>olm-rs</code>.</p>
 </div></details><h2 id="modules" class="small-section-header"><a href="#modules">Modules</a></h2>
 <div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="megolm/index.html" title="vodozemac::megolm mod">megolm</a></div><div class="item-right docblock-short"><p>An implementation of the Megolm ratchet.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="olm/index.html" title="vodozemac::olm mod">olm</a></div><div class="item-right docblock-short"><p>An implementation of the Olm ratchet.</p>
@@ -191,5 +186,5 @@ fixed method has been exposed in upstream <code>olm-rs</code>.</p>
 <div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.DecodeError.html" title="vodozemac::DecodeError enum">DecodeError</a></div><div class="item-right docblock-short"></div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.KeyError.html" title="vodozemac::KeyError enum">KeyError</a></div><div class="item-right docblock-short"><p>Error type describing failures that can happen when we try decode or use a
 cryptographic key.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.LibolmUnpickleError.html" title="vodozemac::LibolmUnpickleError enum">LibolmUnpickleError</a><span class="stab portability" title="This is supported on crate feature `libolm-compat` only"><code>libolm-compat</code></span></div><div class="item-right docblock-short"></div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.SignatureError.html" title="vodozemac::SignatureError enum">SignatureError</a></div><div class="item-right docblock-short"><p>Error type describing signature verification failures.</p>
-</div></div></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (03a8cc7df 2022-02-21)" ></div>
+</div></div></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (68369a041 2022-02-22)" ></div>
 </body></html>
