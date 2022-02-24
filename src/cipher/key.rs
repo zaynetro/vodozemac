@@ -27,13 +27,13 @@ type HmacSha256Key = [u8; 32];
 
 #[derive(Zeroize)]
 #[zeroize(drop)]
-struct ExpandedKeys(Box<[u8; 80]>);
+pub struct ExpandedKeys(Box<[u8; 80]>);
 
 impl ExpandedKeys {
     const OLM_HKDF_INFO: &'static [u8] = b"OLM_KEYS";
     const MEGOLM_HKDF_INFO: &'static [u8] = b"MEGOLM_KEYS";
 
-    fn new(message_key: &[u8; 32]) -> Self {
+    pub fn new(message_key: &[u8; 32]) -> Self {
         Self::new_helper(message_key, Self::OLM_HKDF_INFO)
     }
 

@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-mod key;
+pub mod key;
 
 use aes::Aes256;
 use block_modes::{block_padding::Pkcs7, BlockMode, BlockModeError, Cbc};
