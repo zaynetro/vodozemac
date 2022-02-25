@@ -232,7 +232,6 @@
 <span id="227">227</span>
 <span id="228">228</span>
 <span id="229">229</span>
-<span id="230">230</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Denis Kasak, Damir Jelić</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -278,11 +277,10 @@
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;libolm-compat&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_secret_key</span>(<span class="kw-2">mut</span> <span class="ident">key</span>: [<span class="ident">u8</span>; <span class="number">32</span>]) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">secret_key</span> <span class="op">=</span> <span class="ident">Curve25519SecretKey::from</span>(<span class="ident">key</span>);
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_secret_key</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">32</span>]) -&gt; <span class="self">Self</span> {
+        <span class="comment">// XXX: Passing in secret array as value.</span>
+        <span class="kw">let</span> <span class="ident">secret_key</span> <span class="op">=</span> <span class="ident">Curve25519SecretKey::from</span>(<span class="kw-2">*</span><span class="ident">key</span>);
         <span class="kw">let</span> <span class="ident">public_key</span> <span class="op">=</span> <span class="ident">Curve25519PublicKey::from</span>(<span class="kw-2">&amp;</span><span class="ident">secret_key</span>);
-
-        <span class="ident">key</span>.<span class="ident">zeroize</span>();
 
         <span class="ident">Curve25519Keypair</span> { <span class="ident">secret_key</span>, <span class="ident">public_key</span>, <span class="ident">encoded_public_key</span>: <span class="ident">public_key</span>.<span class="ident">to_base64</span>() }
     }
@@ -464,5 +462,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (68369a041 2022-02-22)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (4b043faba 2022-02-24)" ></div>
 </body></html>

@@ -676,6 +676,11 @@
 <span id="671">671</span>
 <span id="672">672</span>
 <span id="673">673</span>
+<span id="674">674</span>
+<span id="675">675</span>
+<span id="676">676</span>
+<span id="677">677</span>
+<span id="678">678</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Damir Jelić</span>
 <span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -720,7 +725,7 @@
 };
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">olm::messages</span>::{<span class="ident">Message</span>, <span class="ident">OlmMessage</span>, <span class="ident">PreKeyMessage</span>},
-    <span class="ident">utilities::base64_encode</span>,
+    <span class="ident">utilities</span>::{<span class="ident">base64_encode</span>, <span class="ident">DecodeSecret</span>},
     <span class="ident">Curve25519PublicKey</span>, <span class="ident">DecodeError</span>,
 };
 
@@ -984,8 +989,8 @@
         <span class="attribute">#[<span class="ident">zeroize</span>(<span class="ident">drop</span>)]</span>
         <span class="kw">struct</span> <span class="ident">SenderChain</span> {
             <span class="ident">public_ratchet_key</span>: [<span class="ident">u8</span>; <span class="number">32</span>],
-            <span class="ident">secret_ratchet_key</span>: [<span class="ident">u8</span>; <span class="number">32</span>],
-            <span class="ident">chain_key</span>: [<span class="ident">u8</span>; <span class="number">32</span>],
+            <span class="ident">secret_ratchet_key</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span>,
+            <span class="ident">chain_key</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span>,
             <span class="ident">chain_key_index</span>: <span class="ident">u32</span>,
         }
 
@@ -995,8 +1000,8 @@
             ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="kw">crate</span>::utilities::LibolmDecodeError</span><span class="op">&gt;</span> {
                 <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
                     <span class="ident">public_ratchet_key</span>: <span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span><span class="ident">::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>,
-                    <span class="ident">secret_ratchet_key</span>: <span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span><span class="ident">::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>,
-                    <span class="ident">chain_key</span>: <span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span><span class="ident">::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>,
+                    <span class="ident">secret_ratchet_key</span>: <span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span><span class="ident">::decode_secret</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>,
+                    <span class="ident">chain_key</span>: <span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span><span class="ident">::decode_secret</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>,
                     <span class="ident">chain_key_index</span>: <span class="ident">u32::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>,
                 })
             }
@@ -1005,8 +1010,8 @@
         <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Zeroize</span>)]</span>
         <span class="attribute">#[<span class="ident">zeroize</span>(<span class="ident">drop</span>)]</span>
         <span class="kw">struct</span> <span class="ident">ReceivingChain</span> {
-            <span class="ident">ratchet_key</span>: [<span class="ident">u8</span>; <span class="number">32</span>],
-            <span class="ident">chain_key</span>: [<span class="ident">u8</span>; <span class="number">32</span>],
+            <span class="ident">public_ratchet_key</span>: [<span class="ident">u8</span>; <span class="number">32</span>],
+            <span class="ident">chain_key</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span>,
             <span class="ident">chain_key_index</span>: <span class="ident">u32</span>,
         }
 
@@ -1015,8 +1020,8 @@
                 <span class="ident">reader</span>: <span class="kw-2">&amp;mut</span> <span class="kw">impl</span> <span class="ident">std::io::Read</span>,
             ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="kw">crate</span>::utilities::LibolmDecodeError</span><span class="op">&gt;</span> {
                 <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-                    <span class="ident">ratchet_key</span>: <span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span><span class="ident">::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>,
-                    <span class="ident">chain_key</span>: <span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span><span class="ident">::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>,
+                    <span class="ident">public_ratchet_key</span>: <span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span><span class="ident">::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>,
+                    <span class="ident">chain_key</span>: <span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span><span class="ident">::decode_secret</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>,
                     <span class="ident">chain_key_index</span>: <span class="ident">u32::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>,
                 })
             }
@@ -1024,9 +1029,11 @@
 
         <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ReceivingChain</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ReceiverChain</span> {
             <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">chain</span>: <span class="kw-2">&amp;</span><span class="ident">ReceivingChain</span>) -&gt; <span class="self">Self</span> {
-                <span class="kw">let</span> <span class="ident">ratchet_key</span> <span class="op">=</span> <span class="ident">RemoteRatchetKey::from</span>(<span class="ident">chain</span>.<span class="ident">ratchet_key</span>);
-                <span class="kw">let</span> <span class="ident">chain_key</span> <span class="op">=</span>
-                    <span class="ident">RemoteChainKey::from_bytes_and_index</span>(<span class="ident">chain</span>.<span class="ident">chain_key</span>, <span class="ident">chain</span>.<span class="ident">chain_key_index</span>);
+                <span class="kw">let</span> <span class="ident">ratchet_key</span> <span class="op">=</span> <span class="ident">RemoteRatchetKey::from</span>(<span class="ident">chain</span>.<span class="ident">public_ratchet_key</span>);
+                <span class="kw">let</span> <span class="ident">chain_key</span> <span class="op">=</span> <span class="ident">RemoteChainKey::from_bytes_and_index</span>(
+                    <span class="ident">chain</span>.<span class="ident">chain_key</span>.<span class="ident">clone</span>(),
+                    <span class="ident">chain</span>.<span class="ident">chain_key_index</span>,
+                );
 
                 <span class="ident">ReceiverChain::new</span>(<span class="ident">ratchet_key</span>, <span class="ident">chain_key</span>)
             }
@@ -1036,7 +1043,7 @@
         <span class="attribute">#[<span class="ident">zeroize</span>(<span class="ident">drop</span>)]</span>
         <span class="kw">struct</span> <span class="ident">MessageKey</span> {
             <span class="ident">ratchet_key</span>: [<span class="ident">u8</span>; <span class="number">32</span>],
-            <span class="ident">message_key</span>: [<span class="ident">u8</span>; <span class="number">32</span>],
+            <span class="ident">message_key</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span>,
             <span class="ident">index</span>: <span class="ident">u32</span>,
         }
 
@@ -1046,7 +1053,7 @@
             ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="kw">crate</span>::utilities::LibolmDecodeError</span><span class="op">&gt;</span> {
                 <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
                     <span class="ident">ratchet_key</span>: <span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span><span class="ident">::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>,
-                    <span class="ident">message_key</span>: <span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span><span class="ident">::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>,
+                    <span class="ident">message_key</span>: <span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span><span class="ident">::decode_secret</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>,
                     <span class="ident">index</span>: <span class="ident">u32::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>,
                 })
             }
@@ -1054,7 +1061,7 @@
 
         <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">MessageKey</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RemoteMessageKey</span> {
             <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">MessageKey</span>) -&gt; <span class="self">Self</span> {
-                <span class="ident">RemoteMessageKey</span> { <span class="ident">key</span>: <span class="ident">key</span>.<span class="ident">message_key</span>, <span class="ident">index</span>: <span class="ident">key</span>.<span class="ident">index</span>.<span class="ident">into</span>() }
+                <span class="ident">RemoteMessageKey</span> { <span class="ident">key</span>: <span class="ident">key</span>.<span class="ident">message_key</span>.<span class="ident">clone</span>(), <span class="ident">index</span>: <span class="ident">key</span>.<span class="ident">index</span>.<span class="ident">into</span>() }
             }
         }
 
@@ -1064,7 +1071,7 @@
             <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
             <span class="ident">received_message</span>: <span class="ident">bool</span>,
             <span class="ident">session_keys</span>: <span class="ident">SessionKeys</span>,
-            <span class="ident">root_key</span>: [<span class="ident">u8</span>; <span class="number">32</span>],
+            <span class="ident">root_key</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span>,
             <span class="ident">sender_chains</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SenderChain</span><span class="op">&gt;</span>,
             <span class="ident">receiver_chains</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ReceivingChain</span><span class="op">&gt;</span>,
             <span class="ident">message_keys</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MessageKey</span><span class="op">&gt;</span>,
@@ -1078,7 +1085,7 @@
                     <span class="ident">version</span>: <span class="ident">u32::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>,
                     <span class="ident">received_message</span>: <span class="ident">bool::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>,
                     <span class="ident">session_keys</span>: <span class="ident">SessionKeys::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>,
-                    <span class="ident">root_key</span>: <span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span><span class="ident">::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>,
+                    <span class="ident">root_key</span>: <span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span><span class="ident">::decode_secret</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>,
                     <span class="ident">sender_chains</span>: <span class="ident">Vec::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>,
                     <span class="ident">receiver_chains</span>: <span class="ident">Vec::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>,
                     <span class="ident">message_keys</span>: <span class="ident">Vec::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>,
@@ -1115,12 +1122,15 @@
                 }
 
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">chain</span>) <span class="op">=</span> <span class="ident">pickle</span>.<span class="ident">sender_chains</span>.<span class="ident">get</span>(<span class="number">0</span>) {
+                    <span class="comment">// XXX: Passing in secret array as value.</span>
                     <span class="kw">let</span> <span class="ident">ratchet_key</span> <span class="op">=</span>
-                        <span class="ident">RatchetKey::from</span>(<span class="ident">Curve25519SecretKey::from</span>(<span class="ident">chain</span>.<span class="ident">secret_ratchet_key</span>));
-                    <span class="kw">let</span> <span class="ident">chain_key</span> <span class="op">=</span>
-                        <span class="ident">ChainKey::from_bytes_and_index</span>(<span class="ident">chain</span>.<span class="ident">chain_key</span>, <span class="ident">chain</span>.<span class="ident">chain_key_index</span>);
+                        <span class="ident">RatchetKey::from</span>(<span class="ident">Curve25519SecretKey::from</span>(<span class="kw-2">*</span><span class="ident">chain</span>.<span class="ident">secret_ratchet_key</span>));
+                    <span class="kw">let</span> <span class="ident">chain_key</span> <span class="op">=</span> <span class="ident">ChainKey::from_bytes_and_index</span>(
+                        <span class="ident">chain</span>.<span class="ident">chain_key</span>.<span class="ident">clone</span>(),
+                        <span class="ident">chain</span>.<span class="ident">chain_key_index</span>,
+                    );
 
-                    <span class="kw">let</span> <span class="ident">root_key</span> <span class="op">=</span> <span class="ident">RootKey::new</span>(<span class="ident">pickle</span>.<span class="ident">root_key</span>);
+                    <span class="kw">let</span> <span class="ident">root_key</span> <span class="op">=</span> <span class="ident">RootKey::new</span>(<span class="ident">pickle</span>.<span class="ident">root_key</span>.<span class="ident">clone</span>());
 
                     <span class="kw">let</span> <span class="ident">ratchet</span> <span class="op">=</span> <span class="ident">Ratchet::new_with_ratchet_key</span>(<span class="ident">root_key</span>, <span class="ident">ratchet_key</span>);
                     <span class="kw">let</span> <span class="ident">sending_ratchet</span> <span class="op">=</span>
@@ -1133,7 +1143,7 @@
                     })
                 } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">chain</span>) <span class="op">=</span> <span class="ident">receiving_chains</span>.<span class="ident">get</span>(<span class="number">0</span>) {
                     <span class="kw">let</span> <span class="ident">sending_ratchet</span> <span class="op">=</span> <span class="ident">DoubleRatchet::inactive</span>(
-                        <span class="ident">RemoteRootKey::new</span>(<span class="ident">pickle</span>.<span class="ident">root_key</span>),
+                        <span class="ident">RemoteRootKey::new</span>(<span class="ident">pickle</span>.<span class="ident">root_key</span>.<span class="ident">clone</span>()),
                         <span class="ident">chain</span>.<span class="ident">ratchet_key</span>(),
                     );
 
@@ -1350,5 +1360,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (68369a041 2022-02-22)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (4b043faba 2022-02-24)" ></div>
 </body></html>

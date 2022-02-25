@@ -119,7 +119,7 @@
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">base64::DecodeError</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;libolm-compat&quot;</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">libolm_compat</span>::{<span class="ident">unpickle_libolm</span>, <span class="ident">Decode</span>, <span class="ident">LibolmDecodeError</span>};
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">libolm_compat</span>::{<span class="ident">unpickle_libolm</span>, <span class="ident">Decode</span>, <span class="ident">DecodeSecret</span>, <span class="ident">LibolmDecodeError</span>};
 
 <span class="doccomment">/// Decode the input as base64 with no padding.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">base64_decode</span>(<span class="ident">input</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">DecodeError</span><span class="op">&gt;</span> {
@@ -196,5 +196,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (68369a041 2022-02-22)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (4b043faba 2022-02-24)" ></div>
 </body></html>

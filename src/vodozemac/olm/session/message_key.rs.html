@@ -103,7 +103,7 @@
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">cipher::Cipher</span>, <span class="ident">olm::messages::Message</span>};
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">MessageKey</span> {
-    <span class="ident">key</span>: [<span class="ident">u8</span>; <span class="number">32</span>],
+    <span class="ident">key</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span>,
     <span class="ident">ratchet_key</span>: <span class="ident">RatchetPublicKey</span>,
     <span class="ident">index</span>: <span class="ident">u64</span>,
 }
@@ -116,7 +116,7 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">RemoteMessageKey</span> {
-    <span class="kw">pub</span> <span class="ident">key</span>: [<span class="ident">u8</span>; <span class="number">32</span>],
+    <span class="kw">pub</span> <span class="ident">key</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">index</span>: <span class="ident">u64</span>,
 }
 
@@ -127,7 +127,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">MessageKey</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">key</span>: [<span class="ident">u8</span>; <span class="number">32</span>], <span class="ident">ratchet_key</span>: <span class="ident">RatchetPublicKey</span>, <span class="ident">index</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">key</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span>, <span class="ident">ratchet_key</span>: <span class="ident">RatchetPublicKey</span>, <span class="ident">index</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">key</span>, <span class="ident">ratchet_key</span>, <span class="ident">index</span> }
     }
 
@@ -146,7 +146,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">RemoteMessageKey</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">key</span>: [<span class="ident">u8</span>; <span class="number">32</span>], <span class="ident">index</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">key</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span>, <span class="ident">index</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">key</span>, <span class="ident">index</span> }
     }
 
@@ -162,5 +162,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (68369a041 2022-02-22)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (4b043faba 2022-02-24)" ></div>
 </body></html>
