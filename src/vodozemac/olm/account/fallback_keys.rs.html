@@ -135,13 +135,6 @@
 <span id="130">130</span>
 <span id="131">131</span>
 <span id="132">132</span>
-<span id="133">133</span>
-<span id="134">134</span>
-<span id="135">135</span>
-<span id="136">136</span>
-<span id="137">137</span>
-<span id="138">138</span>
-<span id="139">139</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Damir Jelić, Denis Kasak</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -156,12 +149,12 @@
 <span class="comment">// See the License for the specific language governing permissions and</span>
 <span class="comment">// limitations under the License.</span>
 
-<span class="kw">use</span> <span class="ident">rand::thread_rng</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="ident">x25519_dalek::StaticSecret</span> <span class="kw">as</span> <span class="ident">Curve25519SecretKey</span>;
-<span class="kw">use</span> <span class="ident">zeroize::Zeroize</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">types::KeyId</span>, <span class="ident">Curve25519PublicKey</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">types</span>::{<span class="ident">Curve25519SecretKey</span>, <span class="ident">KeyId</span>},
+    <span class="ident">Curve25519PublicKey</span>,
+};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">FallbackKey</span> {
@@ -172,8 +165,7 @@
 
 <span class="kw">impl</span> <span class="ident">FallbackKey</span> {
     <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">key_id</span>: <span class="ident">KeyId</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">thread_rng</span>();
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">Curve25519SecretKey::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rng</span>);
+        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">Curve25519SecretKey::new</span>();
 
         <span class="self">Self</span> { <span class="ident">key_id</span>, <span class="ident">key</span>, <span class="ident">published</span>: <span class="bool-val">false</span> }
     }
@@ -196,12 +188,6 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">published</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">published</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Zeroize</span> <span class="kw">for</span> <span class="ident">FallbackKey</span> {
-    <span class="kw">fn</span> <span class="ident">zeroize</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">key</span>.<span class="ident">zeroize</span>();
     }
 }
 

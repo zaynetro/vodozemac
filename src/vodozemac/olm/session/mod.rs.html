@@ -645,6 +645,7 @@
 <span id="640">640</span>
 <span id="641">641</span>
 <span id="642">642</span>
+<span id="643">643</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Damir Jelić</span>
 <span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -1071,8 +1072,9 @@
 
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">chain</span>) <span class="op">=</span> <span class="ident">pickle</span>.<span class="ident">sender_chains</span>.<span class="ident">get</span>(<span class="number">0</span>) {
                     <span class="comment">// XXX: Passing in secret array as value.</span>
-                    <span class="kw">let</span> <span class="ident">ratchet_key</span> <span class="op">=</span>
-                        <span class="ident">RatchetKey::from</span>(<span class="ident">Curve25519SecretKey::from</span>(<span class="kw-2">*</span><span class="ident">chain</span>.<span class="ident">secret_ratchet_key</span>));
+                    <span class="kw">let</span> <span class="ident">ratchet_key</span> <span class="op">=</span> <span class="ident">RatchetKey::from</span>(<span class="ident">Curve25519SecretKey::from_slice</span>(
+                        <span class="ident">chain</span>.<span class="ident">secret_ratchet_key</span>.<span class="ident">as_ref</span>(),
+                    ));
                     <span class="kw">let</span> <span class="ident">chain_key</span> <span class="op">=</span> <span class="ident">ChainKey::from_bytes_and_index</span>(
                         <span class="ident">chain</span>.<span class="ident">chain_key</span>.<span class="ident">clone</span>(),
                         <span class="ident">chain</span>.<span class="ident">chain_key_index</span>,
