@@ -217,7 +217,7 @@
 <span class="kw">use</span> <span class="ident">zeroize::Zeroize</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::base64_decode</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">cipher::Cipher</span>, <span class="ident">LibolmUnpickleError</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">cipher::Cipher</span>, <span class="ident">LibolmPickleError</span>};
 
 <span class="doccomment">/// Error type describing failure modes for libolm pickle decoding.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Error</span>)]</span>
@@ -239,15 +239,15 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Arguments</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// * pickle - The base64 encoded and encrypted libolm pickle string</span>
+<span class="doccomment">/// * pickle - The base64-encoded and encrypted libolm pickle string</span>
 <span class="doccomment">/// * pickle_key - The key that was used to encrypt the libolm pickle</span>
 <span class="doccomment">/// * pickle_version - The expected version of the pickle. Unpickling will fail</span>
 <span class="doccomment">///   if the version in the pickle doesn&#39;t match this one.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">unpickle_libolm</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">Decode</span>, <span class="ident">T</span>: <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">LibolmUnpickleError</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">unpickle_libolm</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">Decode</span>, <span class="ident">T</span>: <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">LibolmPickleError</span><span class="op">&gt;</span><span class="op">&gt;</span>(
     <span class="ident">pickle</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     <span class="ident">pickle_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     <span class="ident">pickle_version</span>: <span class="ident">u32</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">LibolmUnpickleError</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">LibolmPickleError</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Fetch the pickle version from the given pickle source.</span>
     <span class="kw">fn</span> <span class="ident">get_version</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
         <span class="comment">// Pickle versions are always u32 encoded as a fixed sized integer in</span>
@@ -267,7 +267,7 @@
     <span class="comment">// A pickle starts with a version, which will decide how we need to decode.</span>
     <span class="comment">// We only support the latest version so bail out if it isn&#39;t the expected</span>
     <span class="comment">// pickle version.</span>
-    <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="ident">get_version</span>(<span class="kw-2">&amp;</span><span class="ident">decrypted</span>).<span class="ident">ok_or</span>(<span class="ident">LibolmUnpickleError::MissingVersion</span>)<span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="ident">get_version</span>(<span class="kw-2">&amp;</span><span class="ident">decrypted</span>).<span class="ident">ok_or</span>(<span class="ident">LibolmPickleError::MissingVersion</span>)<span class="question-mark">?</span>;
 
     <span class="kw">if</span> <span class="ident">version</span> <span class="op">==</span> <span class="ident">pickle_version</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">Cursor::new</span>(<span class="kw-2">&amp;</span><span class="ident">decrypted</span>);
@@ -276,7 +276,7 @@
         <span class="ident">decrypted</span>.<span class="ident">zeroize</span>();
         <span class="ident">pickle</span>.<span class="ident">try_into</span>()
     } <span class="kw">else</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">LibolmUnpickleError::Version</span>(<span class="ident">pickle_version</span>, <span class="ident">version</span>))
+        <span class="prelude-val">Err</span>(<span class="ident">LibolmPickleError::Version</span>(<span class="ident">pickle_version</span>, <span class="ident">version</span>))
     }
 }
 
@@ -392,5 +392,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (4b043faba 2022-02-24)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (f0c4da499 2022-03-01)" ></div>
 </body></html>

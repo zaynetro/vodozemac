@@ -405,52 +405,6 @@
 <span id="400">400</span>
 <span id="401">401</span>
 <span id="402">402</span>
-<span id="403">403</span>
-<span id="404">404</span>
-<span id="405">405</span>
-<span id="406">406</span>
-<span id="407">407</span>
-<span id="408">408</span>
-<span id="409">409</span>
-<span id="410">410</span>
-<span id="411">411</span>
-<span id="412">412</span>
-<span id="413">413</span>
-<span id="414">414</span>
-<span id="415">415</span>
-<span id="416">416</span>
-<span id="417">417</span>
-<span id="418">418</span>
-<span id="419">419</span>
-<span id="420">420</span>
-<span id="421">421</span>
-<span id="422">422</span>
-<span id="423">423</span>
-<span id="424">424</span>
-<span id="425">425</span>
-<span id="426">426</span>
-<span id="427">427</span>
-<span id="428">428</span>
-<span id="429">429</span>
-<span id="430">430</span>
-<span id="431">431</span>
-<span id="432">432</span>
-<span id="433">433</span>
-<span id="434">434</span>
-<span id="435">435</span>
-<span id="436">436</span>
-<span id="437">437</span>
-<span id="438">438</span>
-<span id="439">439</span>
-<span id="440">440</span>
-<span id="441">441</span>
-<span id="442">442</span>
-<span id="443">443</span>
-<span id="444">444</span>
-<span id="445">445</span>
-<span id="446">446</span>
-<span id="447">447</span>
-<span id="448">448</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -465,10 +419,7 @@
 <span class="comment">// See the License for the specific language governing permissions and</span>
 <span class="comment">// limitations under the License.</span>
 
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">io</span>::{<span class="ident">Cursor</span>, <span class="ident">Read</span>},
-    <span class="ident">ops::Deref</span>,
-};
+<span class="kw">use</span> <span class="ident">std::io</span>::{<span class="ident">Cursor</span>, <span class="ident">Read</span>};
 
 <span class="kw">use</span> <span class="ident">block_modes::BlockModeError</span>;
 <span class="kw">use</span> <span class="ident">hmac::digest::MacError</span>;
@@ -477,15 +428,13 @@
 <span class="kw">use</span> <span class="ident">zeroize::Zeroize</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">message::MegolmMessage</span>,
-    <span class="ident">ratchet</span>::{<span class="ident">MegolmRatchetUnpicklingError</span>, <span class="ident">Ratchet</span>, <span class="ident">RatchetPickle</span>},
-    <span class="ident">GroupSession</span>, <span class="ident">SessionKey</span>, <span class="ident">SESSION_KEY_VERSION</span>,
+    <span class="ident">message::MegolmMessage</span>, <span class="ident">ratchet::Ratchet</span>, <span class="ident">GroupSession</span>, <span class="ident">SessionKey</span>, <span class="ident">SESSION_KEY_VERSION</span>,
 };
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">cipher::Cipher</span>,
     <span class="ident">types</span>::{<span class="ident">Ed25519PublicKey</span>, <span class="ident">Ed25519Signature</span>, <span class="ident">SignatureError</span>},
-    <span class="ident">utilities</span>::{<span class="ident">base64_decode</span>, <span class="ident">base64_encode</span>, <span class="ident">DecodeSecret</span>},
-    <span class="ident">DecodeError</span>,
+    <span class="ident">utilities</span>::{<span class="ident">base64_decode</span>, <span class="ident">base64_encode</span>, <span class="ident">pickle</span>, <span class="ident">unpickle</span>, <span class="ident">DecodeSecret</span>},
+    <span class="ident">DecodeError</span>, <span class="ident">PickleError</span>,
 };
 
 <span class="kw">const</span> <span class="ident">SESSION_KEY_EXPORT_VERSION</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">1</span>;
@@ -539,17 +488,12 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Zeroize</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
+<span class="attribute">#[<span class="ident">zeroize</span>(<span class="ident">drop</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ExportedSessionKey</span>(<span class="kw">pub</span> <span class="ident">String</span>);
 
 <span class="kw">impl</span> <span class="ident">ExportedSessionKey</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">ExportedSessionKey</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">zeroize</span>()
     }
 }
 
@@ -699,33 +643,27 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pickle_to_json_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">InboundGroupSessionPickledJSON</span> {
-        <span class="kw">let</span> <span class="ident">pickle</span>: <span class="ident">InboundGroupSessionPickle</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pickle</span>();
-        <span class="ident">InboundGroupSessionPickledJSON</span>(
-            <span class="ident">serde_json::to_string_pretty</span>(<span class="kw-2">&amp;</span><span class="ident">pickle</span>)
-                .<span class="ident">expect</span>(<span class="string">&quot;Inbound group session serialization failed.&quot;</span>),
-        )
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unpickle_from_json_str</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">InboundGroupSessionUnpicklingError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">pickle</span>: <span class="ident">InboundGroupSessionPickle</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="ident">input</span>)<span class="question-mark">?</span>;
-        <span class="ident">pickle</span>.<span class="ident">try_into</span>()
-    }
-
+    <span class="doccomment">/// Convert the inbound group session into a struct which implements</span>
+    <span class="doccomment">/// [`serde::Serialize`] and [`serde::Deserialize`].</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pickle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">InboundGroupSessionPickle</span> {
         <span class="ident">InboundGroupSessionPickle</span> {
-            <span class="ident">initial_ratchet</span>: <span class="self">self</span>.<span class="ident">initial_ratchet</span>.<span class="ident">clone</span>().<span class="ident">into</span>(),
-            <span class="ident">latest_ratchet</span>: <span class="self">self</span>.<span class="ident">latest_ratchet</span>.<span class="ident">clone</span>().<span class="ident">into</span>(),
+            <span class="ident">initial_ratchet</span>: <span class="self">self</span>.<span class="ident">initial_ratchet</span>.<span class="ident">clone</span>(),
             <span class="ident">signing_key</span>: <span class="self">self</span>.<span class="ident">signing_key</span>,
             <span class="ident">signing_key_verified</span>: <span class="self">self</span>.<span class="ident">signing_key_verified</span>,
         }
+    }
+
+    <span class="doccomment">/// Restore an [`InboundGroupSession`] from a previously saved</span>
+    <span class="doccomment">/// [`InboundGroupSessionPickle`].</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_pickle</span>(<span class="ident">pickle</span>: <span class="ident">InboundGroupSessionPickle</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::from</span>(<span class="ident">pickle</span>)
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;libolm-compat&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_libolm_pickle</span>(
         <span class="ident">pickle</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">pickle_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="kw">crate</span>::LibolmUnpickleError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="kw">crate</span>::LibolmPickleError</span><span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utilities</span>::{<span class="ident">unpickle_libolm</span>, <span class="ident">Decode</span>};
 
         <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Zeroize</span>)]</span>
@@ -773,7 +711,7 @@
         }
 
         <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">Pickle</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">InboundGroupSession</span> {
-            <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::LibolmUnpickleError</span>;
+            <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::LibolmPickleError</span>;
 
             <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">pickle</span>: <span class="ident">Pickle</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
                 <span class="comment">// Removing the borrow doesn&#39;t work and clippy complains about</span>
@@ -795,66 +733,48 @@
     }
 }
 
+<span class="doccomment">/// A format suitable for serialization which implements [`serde::Serialize`]</span>
+<span class="doccomment">/// and [`serde::Deserialize`]. Obtainable by calling</span>
+<span class="doccomment">/// [`InboundGroupSession::pickle`].</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InboundGroupSessionPickle</span> {
-    <span class="ident">initial_ratchet</span>: <span class="ident">RatchetPickle</span>,
-    <span class="ident">latest_ratchet</span>: <span class="ident">RatchetPickle</span>,
+    <span class="ident">initial_ratchet</span>: <span class="ident">Ratchet</span>,
     <span class="ident">signing_key</span>: <span class="ident">Ed25519PublicKey</span>,
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
     <span class="ident">signing_key_verified</span>: <span class="ident">bool</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">InboundGroupSessionPickle</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unpickle</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">InboundGroupSession</span>, <span class="ident">InboundGroupSessionUnpicklingError</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">try_into</span>()
+    <span class="doccomment">/// Serialize and encrypt the pickle using the given key.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This is the inverse of [`InboundGroupSessionPickle::from_encrypted`].</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encrypt</span>(<span class="self">self</span>, <span class="ident">pickle_key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">32</span>]) -&gt; <span class="ident">String</span> {
+        <span class="ident">pickle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">pickle_key</span>)
+    }
+
+    <span class="doccomment">/// Obtain a pickle from a ciphertext by decrypting and deserializing using</span>
+    <span class="doccomment">/// the given key.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This is the inverse of [`InboundGroupSessionPickle::encrypt`].</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_encrypted</span>(<span class="ident">ciphertext</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">pickle_key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">32</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">PickleError</span><span class="op">&gt;</span> {
+        <span class="ident">unpickle</span>(<span class="ident">ciphertext</span>, <span class="ident">pickle_key</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">InboundGroupSessionPickle</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">InboundGroupSession</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">InboundGroupSessionUnpicklingError</span>;
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">InboundGroupSession</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">InboundGroupSessionPickle</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">session</span>: <span class="kw-2">&amp;</span><span class="ident">InboundGroupSession</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident">session</span>.<span class="ident">pickle</span>()
+    }
+}
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">pickle</span>: <span class="ident">InboundGroupSessionPickle</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">initial_ratchet</span>: <span class="ident">pickle</span>
-                .<span class="ident">initial_ratchet</span>
-                .<span class="ident">try_into</span>()
-                .<span class="ident">map_err</span>(<span class="ident">InboundGroupSessionUnpicklingError::InvalidInitialRatchet</span>)<span class="question-mark">?</span>,
-            <span class="ident">latest_ratchet</span>: <span class="ident">pickle</span>
-                .<span class="ident">latest_ratchet</span>
-                .<span class="ident">try_into</span>()
-                .<span class="ident">map_err</span>(<span class="ident">InboundGroupSessionUnpicklingError::InvalidLatestRatchet</span>)<span class="question-mark">?</span>,
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">InboundGroupSessionPickle</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">InboundGroupSession</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">pickle</span>: <span class="ident">InboundGroupSessionPickle</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">initial_ratchet</span>: <span class="ident">pickle</span>.<span class="ident">initial_ratchet</span>.<span class="ident">clone</span>(),
+            <span class="ident">latest_ratchet</span>: <span class="ident">pickle</span>.<span class="ident">initial_ratchet</span>,
             <span class="ident">signing_key</span>: <span class="ident">pickle</span>.<span class="ident">signing_key</span>,
             <span class="ident">signing_key_verified</span>: <span class="ident">pickle</span>.<span class="ident">signing_key_verified</span>,
-        })
-    }
-}
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Zeroize</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">zeroize</span>(<span class="ident">drop</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InboundGroupSessionPickledJSON</span>(<span class="ident">String</span>);
-
-<span class="kw">impl</span> <span class="ident">InboundGroupSessionPickledJSON</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unpickle</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">InboundGroupSession</span>, <span class="ident">InboundGroupSessionUnpicklingError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">pickle</span>: <span class="ident">InboundGroupSessionPickle</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
-        <span class="ident">pickle</span>.<span class="ident">unpickle</span>()
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">InboundGroupSessionPickledJSON</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">as_str</span>()
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">InboundGroupSessionPickledJSON</span> {
-    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">str</span>;
-
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
-        <span class="self">self</span>.<span class="ident">as_ref</span>()
+        }
     }
 }
 
@@ -862,18 +782,6 @@
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">session</span>: <span class="kw-2">&amp;</span><span class="ident">GroupSession</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::new</span>(<span class="kw-2">&amp;</span><span class="ident">session</span>.<span class="ident">session_key</span>()).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t import the session key export&quot;</span>)
     }
-}
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Error</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">InboundGroupSessionUnpicklingError</span> {
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Invalid initial ratchet&quot;</span>)]</span>
-    <span class="ident">InvalidInitialRatchet</span>(<span class="ident">MegolmRatchetUnpicklingError</span>),
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Invalid latest ratchet&quot;</span>)]</span>
-    <span class="ident">InvalidLatestRatchet</span>(<span class="ident">MegolmRatchetUnpicklingError</span>),
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Invalid public signing key: {0}&quot;</span>)]</span>
-    <span class="ident">InvalidSigningPublicKey</span>(<span class="ident">SignatureError</span>),
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Pickle format corrupted: {0}&quot;</span>)]</span>
-    <span class="ident">CorruptedPickle</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">serde_json::error::Error</span>),
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
@@ -900,5 +808,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (4b043faba 2022-02-24)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (f0c4da499 2022-03-01)" ></div>
 </body></html>

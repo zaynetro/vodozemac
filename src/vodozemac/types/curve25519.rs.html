@@ -218,20 +218,6 @@
 <span id="213">213</span>
 <span id="214">214</span>
 <span id="215">215</span>
-<span id="216">216</span>
-<span id="217">217</span>
-<span id="218">218</span>
-<span id="219">219</span>
-<span id="220">220</span>
-<span id="221">221</span>
-<span id="222">222</span>
-<span id="223">223</span>
-<span id="224">224</span>
-<span id="225">225</span>
-<span id="226">226</span>
-<span id="227">227</span>
-<span id="228">228</span>
-<span id="229">229</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Denis Kasak, Damir Jelić</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -250,7 +236,6 @@
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">x25519_dalek::StaticSecret</span> <span class="kw">as</span> <span class="ident">Curve25519SecretKey</span>;
 <span class="kw">use</span> <span class="ident">x25519_dalek</span>::{<span class="ident">EphemeralSecret</span>, <span class="ident">PublicKey</span>, <span class="ident">ReusableSecret</span>};
-<span class="kw">use</span> <span class="ident">zeroize::Zeroize</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::KeyError</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utilities</span>::{<span class="ident">base64_decode</span>, <span class="ident">base64_encode</span>};
@@ -263,8 +248,6 @@
     <span class="kw">pub</span> <span class="ident">public_key</span>: <span class="ident">Curve25519PublicKey</span>,
     <span class="kw">pub</span> <span class="ident">encoded_public_key</span>: <span class="ident">String</span>,
 }
-
-<span class="kw">const</span> <span class="ident">CURVE25519_SECRET_KEY_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">32</span>;
 
 <span class="kw">impl</span> <span class="ident">Curve25519Keypair</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
@@ -390,33 +373,22 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Curve25519KeypairPickle</span> {
-    <span class="ident">secret</span>: [<span class="ident">u8</span>; <span class="ident">CURVE25519_SECRET_KEY_LEN</span>],
-    <span class="ident">public</span>: [<span class="ident">u8</span>; <span class="ident">Curve25519PublicKey::LENGTH</span>],
-}
-
-<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Curve25519KeypairPickle</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">secret</span>.<span class="ident">zeroize</span>();
-    }
-}
+<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Curve25519KeypairPickle</span>(<span class="ident">Curve25519SecretKey</span>);
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Curve25519KeypairPickle</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Curve25519Keypair</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">pickle</span>: <span class="ident">Curve25519KeypairPickle</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">secret_key</span>: <span class="ident">pickle</span>.<span class="ident">secret</span>.<span class="ident">into</span>(),
-            <span class="ident">public_key</span>: <span class="ident">pickle</span>.<span class="ident">public</span>.<span class="ident">into</span>(),
-            <span class="ident">encoded_public_key</span>: <span class="ident">base64_encode</span>(<span class="ident">pickle</span>.<span class="ident">public</span>),
-        }
+        <span class="kw">let</span> <span class="ident">secret_key</span> <span class="op">=</span> <span class="ident">pickle</span>.<span class="number">0</span>;
+        <span class="kw">let</span> <span class="ident">public_key</span>: <span class="ident">Curve25519PublicKey</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="ident">secret_key</span>).<span class="ident">into</span>();
+        <span class="kw">let</span> <span class="ident">encoded_public_key</span> <span class="op">=</span> <span class="ident">public_key</span>.<span class="ident">to_base64</span>();
+
+        <span class="self">Self</span> { <span class="ident">secret_key</span>, <span class="ident">public_key</span>, <span class="ident">encoded_public_key</span> }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Curve25519Keypair</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Curve25519KeypairPickle</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">key</span>: <span class="ident">Curve25519Keypair</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Curve25519KeypairPickle</span> {
-            <span class="ident">secret</span>: <span class="ident">key</span>.<span class="ident">secret_key</span>.<span class="ident">to_bytes</span>(),
-            <span class="ident">public</span>: <span class="ident">key</span>.<span class="ident">public_key</span>.<span class="ident">to_bytes</span>(),
-        }
+        <span class="ident">Curve25519KeypairPickle</span>(<span class="ident">key</span>.<span class="ident">secret_key</span>)
     }
 }
 
@@ -462,5 +434,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (4b043faba 2022-02-24)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (f0c4da499 2022-03-01)" ></div>
 </body></html>
