@@ -646,6 +646,25 @@
 <span id="641">641</span>
 <span id="642">642</span>
 <span id="643">643</span>
+<span id="644">644</span>
+<span id="645">645</span>
+<span id="646">646</span>
+<span id="647">647</span>
+<span id="648">648</span>
+<span id="649">649</span>
+<span id="650">650</span>
+<span id="651">651</span>
+<span id="652">652</span>
+<span id="653">653</span>
+<span id="654">654</span>
+<span id="655">655</span>
+<span id="656">656</span>
+<span id="657">657</span>
+<span id="658">658</span>
+<span id="659">659</span>
+<span id="660">660</span>
+<span id="661">661</span>
+<span id="662">662</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Damir Jelić</span>
 <span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -663,8 +682,8 @@
 
 <span class="kw">mod</span> <span class="ident">chain_key</span>;
 <span class="kw">mod</span> <span class="ident">double_ratchet</span>;
-<span class="kw">mod</span> <span class="ident">message_key</span>;
-<span class="kw">mod</span> <span class="ident">ratchet</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">message_key</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">ratchet</span>;
 <span class="kw">mod</span> <span class="ident">receiver_chain</span>;
 <span class="kw">mod</span> <span class="ident">root_key</span>;
 
@@ -685,6 +704,8 @@
     <span class="ident">session_keys::SessionKeys</span>,
     <span class="ident">shared_secret</span>::{<span class="ident">RemoteShared3DHSecret</span>, <span class="ident">Shared3DHSecret</span>},
 };
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;low-level-api&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::hazmat::olm::MessageKey</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">olm::messages</span>::{<span class="ident">Message</span>, <span class="ident">OlmMessage</span>, <span class="ident">PreKeyMessage</span>},
     <span class="ident">utilities</span>::{<span class="ident">base64_encode</span>, <span class="ident">pickle</span>, <span class="ident">unpickle</span>, <span class="ident">DecodeSecret</span>},
@@ -838,8 +859,11 @@
         <span class="ident">base64_encode</span>(<span class="ident">digest</span>)
     }
 
-    <span class="comment">// Have we ever received and decrypted a message from the other side?</span>
-    <span class="kw">fn</span> <span class="ident">has_received_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="doccomment">/// Have we ever received and decrypted a message from the other side?</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Used to decide if outgoing messages should be sent as normal or pre-key</span>
+    <span class="doccomment">/// messages.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_received_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="op">!</span><span class="self">self</span>.<span class="ident">receiving_chains</span>.<span class="ident">is_empty</span>()
     }
 
@@ -855,15 +879,29 @@
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">has_received_message</span>() {
             <span class="ident">OlmMessage::Normal</span>(<span class="ident">message</span>)
         } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">PreKeyMessage::new</span>(
-                <span class="self">self</span>.<span class="ident">session_keys</span>.<span class="ident">one_time_key</span>,
-                <span class="self">self</span>.<span class="ident">session_keys</span>.<span class="ident">base_key</span>,
-                <span class="self">self</span>.<span class="ident">session_keys</span>.<span class="ident">identity_key</span>,
-                <span class="ident">message</span>,
-            );
+            <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">PreKeyMessage::new</span>(<span class="self">self</span>.<span class="ident">session_keys</span>, <span class="ident">message</span>);
 
             <span class="ident">OlmMessage::PreKey</span>(<span class="ident">message</span>)
         }
+    }
+
+    <span class="doccomment">/// Get the keys associated with this session.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">session_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SessionKeys</span> {
+        <span class="self">self</span>.<span class="ident">session_keys</span>
+    }
+
+    <span class="doccomment">/// Get the [`MessageKey`] to encrypt the next message.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: Each key obtained in this way should be used to encrypt</span>
+    <span class="doccomment">/// a message and the message must then be sent to the recipient.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Failing to do so will increase the number of out-of-order messages on</span>
+    <span class="doccomment">/// the recipient side. Given that a `Session` can only support a limited</span>
+    <span class="doccomment">/// number of out-of-order messages, this will eventually lead to</span>
+    <span class="doccomment">/// undecryptable messages.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;low-level-api&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_message_key</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">MessageKey</span> {
+        <span class="self">self</span>.<span class="ident">sending_ratchet</span>.<span class="ident">next_message_key</span>()
     }
 
     <span class="doccomment">/// Try to decrypt an Olm message, which will either return the plaintext or</span>
@@ -903,7 +941,7 @@
     <span class="doccomment">/// and [`serde::Deserialize`].</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pickle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SessionPickle</span> {
         <span class="ident">SessionPickle</span> {
-            <span class="ident">session_keys</span>: <span class="self">self</span>.<span class="ident">session_keys</span>.<span class="ident">clone</span>(),
+            <span class="ident">session_keys</span>: <span class="self">self</span>.<span class="ident">session_keys</span>,
             <span class="ident">sending_ratchet</span>: <span class="self">self</span>.<span class="ident">sending_ratchet</span>.<span class="ident">clone</span>(),
             <span class="ident">receiving_chains</span>: <span class="self">self</span>.<span class="ident">receiving_chains</span>.<span class="ident">clone</span>(),
         }
@@ -1087,7 +1125,7 @@
                         <span class="ident">DoubleRatchet::from_ratchet_and_chain_key</span>(<span class="ident">ratchet</span>, <span class="ident">chain_key</span>);
 
                     <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-                        <span class="ident">session_keys</span>: <span class="ident">pickle</span>.<span class="ident">session_keys</span>.<span class="ident">clone</span>(),
+                        <span class="ident">session_keys</span>: <span class="ident">pickle</span>.<span class="ident">session_keys</span>,
                         <span class="ident">sending_ratchet</span>,
                         <span class="ident">receiving_chains</span>,
                     })
@@ -1098,7 +1136,7 @@
                     );
 
                     <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-                        <span class="ident">session_keys</span>: <span class="ident">pickle</span>.<span class="ident">session_keys</span>.<span class="ident">clone</span>(),
+                        <span class="ident">session_keys</span>: <span class="ident">pickle</span>.<span class="ident">session_keys</span>,
                         <span class="ident">sending_ratchet</span>,
                         <span class="ident">receiving_chains</span>,
                     })
@@ -1290,5 +1328,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (03918badd 2022-03-07)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (5f4e06771 2022-03-10)" ></div>
 </body></html>

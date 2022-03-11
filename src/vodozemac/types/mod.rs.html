@@ -59,6 +59,8 @@
 <span id="54">54</span>
 <span id="55">55</span>
 <span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Denis Kasak, Damir Jelić</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -78,8 +80,10 @@
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">curve25519::Curve25519PublicKey</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">curve25519</span>::{<span class="ident">Curve25519Keypair</span>, <span class="ident">Curve25519KeypairPickle</span>, <span class="ident">Curve25519SecretKey</span>};
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">ed25519</span>::{<span class="ident">Ed25519Keypair</span>, <span class="ident">Ed25519KeypairPickle</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">ed25519</span>::{<span class="ident">Ed25519PublicKey</span>, <span class="ident">Ed25519SecretKey</span>, <span class="ident">Ed25519Signature</span>, <span class="ident">SignatureError</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">ed25519</span>::{
+    <span class="ident">Ed25519Keypair</span>, <span class="ident">Ed25519KeypairPickle</span>, <span class="ident">Ed25519PublicKey</span>, <span class="ident">Ed25519SecretKey</span>, <span class="ident">Ed25519Signature</span>,
+    <span class="ident">SignatureError</span>,
+};
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">thiserror::Error</span>;
 
@@ -116,5 +120,5 @@
     <span class="ident">NonContributoryKey</span>,
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (03918badd 2022-03-07)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (5f4e06771 2022-03-10)" ></div>
 </body></html>

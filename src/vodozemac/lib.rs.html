@@ -96,6 +96,7 @@
 <span id="91">91</span>
 <span id="92">92</span>
 <span id="93">93</span>
+<span id="94">94</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Damir Jelić</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -130,13 +131,14 @@
 <span class="kw">mod</span> <span class="ident">types</span>;
 <span class="kw">mod</span> <span class="ident">utilities</span>;
 
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">hazmat</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">megolm</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">olm</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">sas</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">types</span>::{
-    <span class="ident">Curve25519PublicKey</span>, <span class="ident">Ed25519PublicKey</span>, <span class="ident">Ed25519SecretKey</span>, <span class="ident">Ed25519Signature</span>, <span class="ident">KeyError</span>, <span class="ident">KeyId</span>,
-    <span class="ident">SignatureError</span>,
+    <span class="ident">Curve25519PublicKey</span>, <span class="ident">Ed25519Keypair</span>, <span class="ident">Ed25519PublicKey</span>, <span class="ident">Ed25519SecretKey</span>, <span class="ident">Ed25519Signature</span>,
+    <span class="ident">KeyError</span>, <span class="ident">KeyId</span>, <span class="ident">SignatureError</span>,
 };
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">thiserror::Error</span>)]</span>
@@ -190,5 +192,5 @@
     <span class="ident">Base64</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">base64::DecodeError</span>),
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (03918badd 2022-03-07)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (5f4e06771 2022-03-10)" ></div>
 </body></html>

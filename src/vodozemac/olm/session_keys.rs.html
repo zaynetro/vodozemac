@@ -62,11 +62,11 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Curve25519PublicKey</span>;
 
 <span class="doccomment">/// The set of keys that were used to establish the Olm Session,</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">SessionKeys</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">identity_key</span>: <span class="ident">Curve25519PublicKey</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">base_key</span>: <span class="ident">Curve25519PublicKey</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">one_time_key</span>: <span class="ident">Curve25519PublicKey</span>,
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SessionKeys</span> {
+    <span class="kw">pub</span> <span class="ident">identity_key</span>: <span class="ident">Curve25519PublicKey</span>,
+    <span class="kw">pub</span> <span class="ident">base_key</span>: <span class="ident">Curve25519PublicKey</span>,
+    <span class="kw">pub</span> <span class="ident">one_time_key</span>: <span class="ident">Curve25519PublicKey</span>,
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;libolm-compat&quot;</span>)]</span>
@@ -82,5 +82,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (03918badd 2022-03-07)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (5f4e06771 2022-03-10)" ></div>
 </body></html>

@@ -214,6 +214,13 @@
 <span id="209">209</span>
 <span id="210">210</span>
 <span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Damir Jelić</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -233,6 +240,7 @@
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Message</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">olm::SessionKeys</span>,
     <span class="ident">utilities</span>::{<span class="ident">base64_decode</span>, <span class="ident">base64_encode</span>},
     <span class="ident">Curve25519PublicKey</span>, <span class="ident">DecodeError</span>,
 };
@@ -348,13 +356,19 @@
         <span class="ident">base64_encode</span>(<span class="self">self</span>.<span class="ident">to_bytes</span>())
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">one_time_key</span>: <span class="ident">Curve25519PublicKey</span>,
-        <span class="ident">base_key</span>: <span class="ident">Curve25519PublicKey</span>,
-        <span class="ident">identity_key</span>: <span class="ident">Curve25519PublicKey</span>,
-        <span class="ident">message</span>: <span class="ident">Message</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">one_time_key</span>, <span class="ident">base_key</span>, <span class="ident">identity_key</span>, <span class="ident">message</span> }
+    <span class="doccomment">/// Create a new pre-key message from the session keys and standard message.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;low-level-api&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wrap</span>(<span class="ident">session_keys</span>: <span class="ident">SessionKeys</span>, <span class="ident">message</span>: <span class="ident">Message</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident">PreKeyMessage::new</span>(<span class="ident">session_keys</span>, <span class="ident">message</span>)
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">session_keys</span>: <span class="ident">SessionKeys</span>, <span class="ident">message</span>: <span class="ident">Message</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">one_time_key</span>: <span class="ident">session_keys</span>.<span class="ident">one_time_key</span>,
+            <span class="ident">base_key</span>: <span class="ident">session_keys</span>.<span class="ident">base_key</span>,
+            <span class="ident">identity_key</span>: <span class="ident">session_keys</span>.<span class="ident">identity_key</span>,
+            <span class="ident">message</span>,
+        }
     }
 }
 
@@ -426,5 +440,5 @@
     <span class="ident">message</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (03918badd 2022-03-07)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (5f4e06771 2022-03-10)" ></div>
 </body></html>
