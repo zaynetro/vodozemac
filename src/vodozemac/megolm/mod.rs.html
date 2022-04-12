@@ -235,18 +235,6 @@
 <span id="230">230</span>
 <span id="231">231</span>
 <span id="232">232</span>
-<span id="233">233</span>
-<span id="234">234</span>
-<span id="235">235</span>
-<span id="236">236</span>
-<span id="237">237</span>
-<span id="238">238</span>
-<span id="239">239</span>
-<span id="240">240</span>
-<span id="241">241</span>
-<span id="242">242</span>
-<span id="243">243</span>
-<span id="244">244</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -267,26 +255,14 @@
 <span class="kw">mod</span> <span class="ident">inbound_group_session</span>;
 <span class="kw">mod</span> <span class="ident">message</span>;
 <span class="kw">mod</span> <span class="ident">ratchet</span>;
+<span class="kw">mod</span> <span class="ident">session_keys</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">group_session</span>::{<span class="ident">GroupSession</span>, <span class="ident">GroupSessionPickle</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">inbound_group_session</span>::{
-    <span class="ident">DecryptedMessage</span>, <span class="ident">DecryptionError</span>, <span class="ident">ExportedSessionKey</span>, <span class="ident">InboundGroupSession</span>,
-    <span class="ident">InboundGroupSessionPickle</span>, <span class="ident">SessionCreationError</span>,
+    <span class="ident">DecryptedMessage</span>, <span class="ident">DecryptionError</span>, <span class="ident">InboundGroupSession</span>, <span class="ident">InboundGroupSessionPickle</span>,
 };
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">message::MegolmMessage</span>;
-<span class="kw">use</span> <span class="ident">zeroize::Zeroize</span>;
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Zeroize</span>)]</span>
-<span class="attribute">#[<span class="ident">zeroize</span>(<span class="ident">drop</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SessionKey</span>(<span class="kw">pub</span> <span class="ident">String</span>);
-
-<span class="kw">impl</span> <span class="ident">SessionKey</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
-    }
-}
-
-<span class="kw">const</span> <span class="ident">SESSION_KEY_VERSION</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">2</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">session_keys</span>::{<span class="ident">ExportedSessionKey</span>, <span class="ident">SessionKey</span>, <span class="ident">SessionKeyDecodeError</span>};
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">test</span> {
@@ -296,8 +272,8 @@
         <span class="ident">outbound_group_session::OlmOutboundGroupSession</span>,
     };
 
-    <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">GroupSession</span>, <span class="ident">InboundGroupSession</span>, <span class="ident">SessionKey</span>};
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::megolm</span>::{<span class="ident">GroupSessionPickle</span>, <span class="ident">InboundGroupSessionPickle</span>};
+    <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">GroupSession</span>, <span class="ident">InboundGroupSession</span>};
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::megolm</span>::{<span class="ident">GroupSessionPickle</span>, <span class="ident">InboundGroupSessionPickle</span>, <span class="ident">SessionKey</span>};
 
     <span class="kw">const</span> <span class="ident">PICKLE_KEY</span>: [<span class="ident">u8</span>; <span class="number">32</span>] <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">32</span>];
 
@@ -306,7 +282,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">GroupSession::new</span>();
         <span class="kw">let</span> <span class="ident">session_key</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">session_key</span>();
 
-        <span class="kw">let</span> <span class="ident">olm_session</span> <span class="op">=</span> <span class="ident">OlmInboundGroupSession::new</span>(<span class="ident">session_key</span>.<span class="ident">as_str</span>())<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">olm_session</span> <span class="op">=</span> <span class="ident">OlmInboundGroupSession::new</span>(<span class="kw-2">&amp;</span><span class="ident">session_key</span>.<span class="ident">to_base64</span>())<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">plaintext</span> <span class="op">=</span> <span class="string">&quot;It&#39;s a secret to everybody&quot;</span>;
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">encrypt</span>(<span class="ident">plaintext</span>).<span class="ident">to_base64</span>();
@@ -345,9 +321,9 @@
     <span class="kw">fn</span> <span class="ident">decrypting</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">olm_session</span> <span class="op">=</span> <span class="ident">OlmOutboundGroupSession::new</span>();
 
-        <span class="kw">let</span> <span class="ident">session_key</span> <span class="op">=</span> <span class="ident">SessionKey</span>(<span class="ident">olm_session</span>.<span class="ident">session_key</span>());
+        <span class="kw">let</span> <span class="ident">session_key</span> <span class="op">=</span> <span class="ident">SessionKey::from_base64</span>(<span class="kw-2">&amp;</span><span class="ident">olm_session</span>.<span class="ident">session_key</span>())<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">InboundGroupSession::new</span>(<span class="kw-2">&amp;</span><span class="ident">session_key</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">InboundGroupSession::new</span>(<span class="kw-2">&amp;</span><span class="ident">session_key</span>);
 
         <span class="kw">let</span> <span class="ident">plaintext</span> <span class="op">=</span> <span class="string">&quot;Hello&quot;</span>;
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">olm_session</span>.<span class="ident">encrypt</span>(<span class="ident">plaintext</span>).<span class="ident">as_str</span>().<span class="ident">try_into</span>()<span class="question-mark">?</span>;
@@ -395,7 +371,7 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">exporting</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">GroupSession::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inbound</span> <span class="op">=</span> <span class="ident">InboundGroupSession::new</span>(<span class="kw-2">&amp;</span><span class="ident">session</span>.<span class="ident">session_key</span>())<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inbound</span> <span class="op">=</span> <span class="ident">InboundGroupSession::new</span>(<span class="kw-2">&amp;</span><span class="ident">session</span>.<span class="ident">session_key</span>());
 
         <span class="macro">assert_eq!</span>(<span class="ident">session</span>.<span class="ident">session_id</span>(), <span class="ident">inbound</span>.<span class="ident">session_id</span>());
 
@@ -410,7 +386,7 @@
         <span class="macro">assert_eq!</span>(<span class="ident">decrypted</span>.<span class="ident">message_index</span>, <span class="number">0</span>);
 
         <span class="kw">let</span> <span class="ident">export</span> <span class="op">=</span> <span class="ident">inbound</span>.<span class="ident">export_at</span>(<span class="number">1</span>).<span class="ident">expect</span>(<span class="string">&quot;Can export at the initial index.&quot;</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">imported</span> <span class="op">=</span> <span class="ident">InboundGroupSession::import</span>(<span class="kw-2">&amp;</span><span class="ident">export</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">imported</span> <span class="op">=</span> <span class="ident">InboundGroupSession::import</span>(<span class="kw-2">&amp;</span><span class="ident">export</span>);
 
         <span class="macro">assert_eq!</span>(<span class="ident">session</span>.<span class="ident">session_id</span>(), <span class="ident">imported</span>.<span class="ident">session_id</span>());
 
@@ -478,7 +454,7 @@
         <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">GroupSession::new</span>();
         <span class="kw">let</span> <span class="ident">session_key</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">session_key</span>();
 
-        <span class="kw">let</span> <span class="ident">olm</span> <span class="op">=</span> <span class="ident">OlmInboundGroupSession::new</span>(<span class="ident">session_key</span>.<span class="ident">as_str</span>())<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">olm</span> <span class="op">=</span> <span class="ident">OlmInboundGroupSession::new</span>(<span class="kw-2">&amp;</span><span class="ident">session_key</span>.<span class="ident">to_base64</span>())<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="string">&quot;DEFAULT_PICKLE_KEY&quot;</span>;
         <span class="kw">let</span> <span class="ident">pickle</span> <span class="op">=</span> <span class="ident">olm</span>.<span class="ident">pickle</span>(<span class="ident">olm_rs::PicklingMode::Encrypted</span> { <span class="ident">key</span>: <span class="ident">key</span>.<span class="ident">as_bytes</span>().<span class="ident">to_vec</span>() });
@@ -492,5 +468,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (8f36334ca 2022-04-06)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (90ca44752 2022-04-11)" ></div>
 </body></html>

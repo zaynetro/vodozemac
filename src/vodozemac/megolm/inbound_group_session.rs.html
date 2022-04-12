@@ -390,71 +390,6 @@
 <span id="385">385</span>
 <span id="386">386</span>
 <span id="387">387</span>
-<span id="388">388</span>
-<span id="389">389</span>
-<span id="390">390</span>
-<span id="391">391</span>
-<span id="392">392</span>
-<span id="393">393</span>
-<span id="394">394</span>
-<span id="395">395</span>
-<span id="396">396</span>
-<span id="397">397</span>
-<span id="398">398</span>
-<span id="399">399</span>
-<span id="400">400</span>
-<span id="401">401</span>
-<span id="402">402</span>
-<span id="403">403</span>
-<span id="404">404</span>
-<span id="405">405</span>
-<span id="406">406</span>
-<span id="407">407</span>
-<span id="408">408</span>
-<span id="409">409</span>
-<span id="410">410</span>
-<span id="411">411</span>
-<span id="412">412</span>
-<span id="413">413</span>
-<span id="414">414</span>
-<span id="415">415</span>
-<span id="416">416</span>
-<span id="417">417</span>
-<span id="418">418</span>
-<span id="419">419</span>
-<span id="420">420</span>
-<span id="421">421</span>
-<span id="422">422</span>
-<span id="423">423</span>
-<span id="424">424</span>
-<span id="425">425</span>
-<span id="426">426</span>
-<span id="427">427</span>
-<span id="428">428</span>
-<span id="429">429</span>
-<span id="430">430</span>
-<span id="431">431</span>
-<span id="432">432</span>
-<span id="433">433</span>
-<span id="434">434</span>
-<span id="435">435</span>
-<span id="436">436</span>
-<span id="437">437</span>
-<span id="438">438</span>
-<span id="439">439</span>
-<span id="440">440</span>
-<span id="441">441</span>
-<span id="442">442</span>
-<span id="443">443</span>
-<span id="444">444</span>
-<span id="445">445</span>
-<span id="446">446</span>
-<span id="447">447</span>
-<span id="448">448</span>
-<span id="449">449</span>
-<span id="450">450</span>
-<span id="451">451</span>
-<span id="452">452</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -469,7 +404,7 @@
 <span class="comment">// See the License for the specific language governing permissions and</span>
 <span class="comment">// limitations under the License.</span>
 
-<span class="kw">use</span> <span class="ident">std::io</span>::{<span class="ident">Cursor</span>, <span class="ident">Read</span>};
+<span class="kw">use</span> <span class="ident">std::io::Read</span>;
 
 <span class="kw">use</span> <span class="ident">aes::cipher::block_padding::UnpadError</span>;
 <span class="kw">use</span> <span class="ident">hmac::digest::MacError</span>;
@@ -478,30 +413,17 @@
 <span class="kw">use</span> <span class="ident">zeroize::Zeroize</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">message::MegolmMessage</span>, <span class="ident">ratchet::Ratchet</span>, <span class="ident">GroupSession</span>, <span class="ident">SessionKey</span>, <span class="ident">SESSION_KEY_VERSION</span>,
+    <span class="ident">message::MegolmMessage</span>,
+    <span class="ident">ratchet::Ratchet</span>,
+    <span class="ident">session_keys</span>::{<span class="ident">ExportedSessionKey</span>, <span class="ident">SessionKey</span>},
+    <span class="ident">GroupSession</span>,
 };
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">cipher::Cipher</span>,
-    <span class="ident">types</span>::{<span class="ident">Ed25519PublicKey</span>, <span class="ident">Ed25519Signature</span>, <span class="ident">SignatureError</span>},
-    <span class="ident">utilities</span>::{<span class="ident">base64_decode</span>, <span class="ident">base64_encode</span>, <span class="ident">pickle</span>, <span class="ident">unpickle</span>, <span class="ident">DecodeSecret</span>},
+    <span class="ident">types</span>::{<span class="ident">Ed25519PublicKey</span>, <span class="ident">SignatureError</span>},
+    <span class="ident">utilities</span>::{<span class="ident">base64_encode</span>, <span class="ident">pickle</span>, <span class="ident">unpickle</span>, <span class="ident">DecodeSecret</span>},
     <span class="ident">DecodeError</span>, <span class="ident">PickleError</span>,
 };
-
-<span class="kw">const</span> <span class="ident">SESSION_KEY_EXPORT_VERSION</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">1</span>;
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Error</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SessionCreationError</span> {
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The session had a invalid version, expected {0}, got {1}&quot;</span>)]</span>
-    <span class="ident">Version</span>(<span class="ident">u8</span>, <span class="ident">u8</span>),
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The session key was too short {0}&quot;</span>)]</span>
-    <span class="ident">Read</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">std::io::Error</span>),
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The session key wasn&#39;t valid base64: {0}&quot;</span>)]</span>
-    <span class="ident">Base64</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">base64::DecodeError</span>),
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The signature on the session key was invalid: {0}&quot;</span>)]</span>
-    <span class="ident">Signature</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">SignatureError</span>),
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The public key of session was invalid: {0}&quot;</span>)]</span>
-    <span class="ident">PublicKey</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident"><span class="kw">crate</span>::KeyError</span>),
-}
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Error</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DecryptionError</span> {
@@ -536,69 +458,30 @@
     <span class="kw">pub</span> <span class="ident">message_index</span>: <span class="ident">u32</span>,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Zeroize</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
-<span class="attribute">#[<span class="ident">zeroize</span>(<span class="ident">drop</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ExportedSessionKey</span>(<span class="kw">pub</span> <span class="ident">String</span>);
-
-<span class="kw">impl</span> <span class="ident">ExportedSessionKey</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
-    }
-}
-
 <span class="kw">impl</span> <span class="ident">InboundGroupSession</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">session_key</span>: <span class="kw-2">&amp;</span><span class="ident">SessionKey</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">SessionCreationError</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="self">Self</span>::new_helper</span>(<span class="kw-2">&amp;</span><span class="ident">session_key</span>.<span class="number">0</span>, <span class="bool-val">false</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">SessionKey</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="ident">initial_ratchet</span> <span class="op">=</span>
+            <span class="ident">Ratchet::from_bytes</span>(<span class="ident">key</span>.<span class="ident">session_key</span>.<span class="ident">ratchet</span>.<span class="ident">clone</span>(), <span class="ident">key</span>.<span class="ident">session_key</span>.<span class="ident">ratchet_index</span>);
+        <span class="kw">let</span> <span class="ident">latest_ratchet</span> <span class="op">=</span> <span class="ident">initial_ratchet</span>.<span class="ident">clone</span>();
+
+        <span class="self">Self</span> {
+            <span class="ident">initial_ratchet</span>,
+            <span class="ident">latest_ratchet</span>,
+            <span class="ident">signing_key</span>: <span class="ident">key</span>.<span class="ident">session_key</span>.<span class="ident">signing_key</span>,
+            <span class="ident">signing_key_verified</span>: <span class="bool-val">true</span>,
+        }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">import</span>(<span class="ident">exported_session_key</span>: <span class="kw-2">&amp;</span><span class="ident">ExportedSessionKey</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">SessionCreationError</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="self">Self</span>::new_helper</span>(<span class="kw-2">&amp;</span><span class="ident">exported_session_key</span>.<span class="number">0</span>, <span class="bool-val">true</span>)
-    }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">import</span>(<span class="ident">session_key</span>: <span class="kw-2">&amp;</span><span class="ident">ExportedSessionKey</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="ident">initial_ratchet</span> <span class="op">=</span>
+            <span class="ident">Ratchet::from_bytes</span>(<span class="ident">session_key</span>.<span class="ident">ratchet</span>.<span class="ident">clone</span>(), <span class="ident">session_key</span>.<span class="ident">ratchet_index</span>);
+        <span class="kw">let</span> <span class="ident">latest_ratchet</span> <span class="op">=</span> <span class="ident">initial_ratchet</span>.<span class="ident">clone</span>();
 
-    <span class="kw">fn</span> <span class="ident">new_helper</span>(<span class="ident">session_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">is_export</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">SessionCreationError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">decoded</span> <span class="op">=</span> <span class="ident">base64_decode</span>(<span class="ident">session_key</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">Cursor::new</span>(<span class="ident">decoded</span>);
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">version</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">1</span>];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">index</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">4</span>];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ratchet</span> <span class="op">=</span> <span class="ident">Box::new</span>([<span class="number">0u8</span>; <span class="number">128</span>]);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">public_key</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="ident">Ed25519PublicKey::LENGTH</span>];
-
-        <span class="ident">cursor</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">version</span>)<span class="question-mark">?</span>;
-
-        <span class="kw">let</span> <span class="ident">expected_version</span> <span class="op">=</span>
-            <span class="kw">if</span> <span class="ident">is_export</span> { <span class="ident">SESSION_KEY_EXPORT_VERSION</span> } <span class="kw">else</span> { <span class="ident">SESSION_KEY_VERSION</span> };
-
-        <span class="kw">if</span> <span class="ident">version</span>[<span class="number">0</span>] <span class="op">!</span><span class="op">=</span> <span class="ident">expected_version</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">SessionCreationError::Version</span>(<span class="ident">SESSION_KEY_VERSION</span>, <span class="ident">version</span>[<span class="number">0</span>]))
-        } <span class="kw">else</span> {
-            <span class="ident">cursor</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">index</span>)<span class="question-mark">?</span>;
-            <span class="ident">cursor</span>.<span class="ident">read_exact</span>(<span class="ident">ratchet</span>.<span class="ident">as_mut_slice</span>())<span class="question-mark">?</span>;
-            <span class="ident">cursor</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">public_key</span>)<span class="question-mark">?</span>;
-
-            <span class="kw">let</span> <span class="ident">signing_key</span> <span class="op">=</span> <span class="ident">Ed25519PublicKey::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">public_key</span>)<span class="question-mark">?</span>;
-
-            <span class="kw">let</span> <span class="ident">signing_key_verified</span> <span class="op">=</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">is_export</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">signature</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="ident">Ed25519Signature::LENGTH</span>];
-
-                <span class="ident">cursor</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">signature</span>)<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">signature</span> <span class="op">=</span> <span class="ident">Ed25519Signature::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">signature</span>)<span class="question-mark">?</span>;
-
-                <span class="kw">let</span> <span class="ident">decoded</span> <span class="op">=</span> <span class="ident">cursor</span>.<span class="ident">into_inner</span>();
-
-                <span class="ident">signing_key</span>.<span class="ident">verify</span>(<span class="kw-2">&amp;</span><span class="ident">decoded</span>[..<span class="ident">decoded</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">64</span>], <span class="kw-2">&amp;</span><span class="ident">signature</span>)<span class="question-mark">?</span>;
-
-                <span class="bool-val">true</span>
-            } <span class="kw">else</span> {
-                <span class="bool-val">false</span>
-            };
-
-            <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">u32::from_be_bytes</span>(<span class="ident">index</span>);
-            <span class="kw">let</span> <span class="ident">initial_ratchet</span> <span class="op">=</span> <span class="ident">Ratchet::from_bytes</span>(<span class="ident">ratchet</span>, <span class="ident">index</span>);
-            <span class="kw">let</span> <span class="ident">latest_ratchet</span> <span class="op">=</span> <span class="ident">initial_ratchet</span>.<span class="ident">clone</span>();
-
-            <span class="prelude-val">Ok</span>(<span class="self">Self</span> { <span class="ident">initial_ratchet</span>, <span class="ident">latest_ratchet</span>, <span class="ident">signing_key</span>, <span class="ident">signing_key_verified</span> })
+        <span class="self">Self</span> {
+            <span class="ident">initial_ratchet</span>,
+            <span class="ident">latest_ratchet</span>,
+            <span class="ident">signing_key</span>: <span class="ident">session_key</span>.<span class="ident">signing_key</span>,
+            <span class="ident">signing_key_verified</span>: <span class="bool-val">false</span>,
         }
     }
 
@@ -688,24 +571,11 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">export_at</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ExportedSessionKey</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">signing_key</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">signing_key</span>;
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ratchet</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">find_ratchet</span>(<span class="ident">index</span>) {
-            <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">ratchet</span>.<span class="ident">index</span>().<span class="ident">to_be_bytes</span>();
+        <span class="self">self</span>.<span class="ident">find_ratchet</span>(<span class="ident">index</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">ratchet</span><span class="op">|</span> <span class="ident">ExportedSessionKey::new</span>(<span class="ident">ratchet</span>, <span class="ident">signing_key</span>))
+    }
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">export</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> [
-                [<span class="ident">SESSION_KEY_EXPORT_VERSION</span>].<span class="ident">as_ref</span>(),
-                <span class="ident">index</span>.<span class="ident">as_ref</span>(),
-                <span class="ident">ratchet</span>.<span class="ident">as_bytes</span>(),
-                <span class="ident">signing_key</span>.<span class="ident">as_bytes</span>(),
-            ]
-            .<span class="ident">concat</span>();
-
-            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">base64_encode</span>(<span class="kw-2">&amp;</span><span class="ident">export</span>);
-            <span class="ident">export</span>.<span class="ident">zeroize</span>();
-
-            <span class="prelude-val">Some</span>(<span class="ident">ExportedSessionKey</span>(<span class="ident">result</span>))
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">export_at_first_known_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ExportedSessionKey</span> {
+        <span class="ident">ExportedSessionKey::new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">initial_ratchet</span>, <span class="self">self</span>.<span class="ident">signing_key</span>)
     }
 
     <span class="doccomment">/// Convert the inbound group session into a struct which implements</span>
@@ -845,7 +715,7 @@
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">GroupSession</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">InboundGroupSession</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">session</span>: <span class="kw-2">&amp;</span><span class="ident">GroupSession</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>(<span class="kw-2">&amp;</span><span class="ident">session</span>.<span class="ident">session_key</span>()).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t import the session key export&quot;</span>)
+        <span class="ident"><span class="self">Self</span>::new</span>(<span class="kw-2">&amp;</span><span class="ident">session</span>.<span class="ident">session_key</span>())
     }
 }
 
@@ -908,5 +778,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (8f36334ca 2022-04-06)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (90ca44752 2022-04-11)" ></div>
 </body></html>
