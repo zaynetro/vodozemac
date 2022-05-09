@@ -252,6 +252,21 @@
 <span id="247">247</span>
 <span id="248">248</span>
 <span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Denis Kasak, Damir Jelić</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -273,26 +288,37 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::KeyError</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utilities</span>::{<span class="ident">base64_decode</span>, <span class="ident">base64_encode</span>};
 
+<span class="doccomment">/// Struct representing a Curve25519 secret key.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Curve25519SecretKey</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">StaticSecret</span><span class="op">&gt;</span>);
 
 <span class="kw">impl</span> <span class="ident">Curve25519SecretKey</span> {
+    <span class="doccomment">/// Generate a new, random, Curve25519SecretKey.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">thread_rng</span>();
 
         <span class="self">Self</span>(<span class="ident">Box::new</span>(<span class="ident">StaticSecret::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rng</span>)))
     }
 
+    <span class="doccomment">/// Create a `Curve25519SecretKey` from the given slice of bytes.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_slice</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">32</span>]) -&gt; <span class="self">Self</span> {
         <span class="comment">// XXX: Passing in secret array as value.</span>
         <span class="self">Self</span>(<span class="ident">Box::new</span>(<span class="ident">StaticSecret::from</span>(<span class="kw-2">*</span><span class="ident">bytes</span>)))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">diffie_hellman</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">their_public_key</span>: <span class="kw-2">&amp;</span><span class="ident">Curve25519PublicKey</span>) -&gt; <span class="ident">SharedSecret</span> {
+    <span class="doccomment">/// Perform a Diffie-Hellman key exchange between the given</span>
+    <span class="doccomment">/// `Curve25519PublicKey` and this `Curve25519SecretKey` and return a shared</span>
+    <span class="doccomment">/// secret.</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">diffie_hellman</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">their_public_key</span>: <span class="kw-2">&amp;</span><span class="ident">Curve25519PublicKey</span>) -&gt; <span class="ident">SharedSecret</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">diffie_hellman</span>(<span class="kw-2">&amp;</span><span class="ident">their_public_key</span>.<span class="ident">inner</span>)
     }
 
+    <span class="doccomment">/// Convert the `Curve25519SecretKey` to a byte array.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: This creates a copy of the key which won&#39;t be zeroized, the</span>
+    <span class="doccomment">/// caller of the method needs to make sure to zeroize the returned array.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; [<span class="ident">u8</span>; <span class="number">32</span>] {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">to_bytes</span>()
     }
@@ -343,6 +369,7 @@
     }
 }
 
+<span class="doccomment">/// Struct representing a Curve25519 public key.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Curve25519PublicKey</span> {
@@ -361,6 +388,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Curve25519PublicKey</span> {
+    <span class="doccomment">/// The number of bytes a Curve25519 public key has.</span>
     <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">LENGTH</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">32</span>;
 
     <span class="doccomment">/// Convert this public key to a byte array.</span>
@@ -375,10 +403,12 @@
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">as_bytes</span>()
     }
 
+    <span class="doccomment">/// Convert the public key to a vector of bytes.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_vec</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">as_bytes</span>().<span class="ident">to_vec</span>()
     }
 
+    <span class="doccomment">/// Create a `Curve25519PublicKey` from a byte array.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_bytes</span>(<span class="ident">bytes</span>: [<span class="ident">u8</span>; <span class="number">32</span>]) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">inner</span>: <span class="ident">PublicKey::from</span>(<span class="ident">bytes</span>) }
     }
@@ -502,5 +532,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (082e4ca49 2022-04-26)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (cb1219871 2022-05-08)" ></div>
 </body></html>

@@ -219,8 +219,8 @@
     <span class="doccomment">/// A session ID is the public part of the Ed25519 key pair associated with</span>
     <span class="doccomment">/// the group session. Due to the construction, every session ID is</span>
     <span class="doccomment">/// (probabilistically) globally unique.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">session_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">signing_key</span>.<span class="ident">public_key_encoded</span>()
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">session_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
+        <span class="self">self</span>.<span class="ident">signing_key</span>.<span class="ident">public_key</span>().<span class="ident">to_base64</span>()
     }
 
     <span class="doccomment">/// Return the current message index.</span>
@@ -312,5 +312,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (082e4ca49 2022-04-26)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (cb1219871 2022-05-08)" ></div>
 </body></html>

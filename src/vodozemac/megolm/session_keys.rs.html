@@ -297,6 +297,52 @@
 <span id="292">292</span>
 <span id="293">293</span>
 <span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2022 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -323,26 +369,56 @@
     <span class="ident">Ed25519PublicKey</span>, <span class="ident">Ed25519Signature</span>, <span class="ident">SignatureError</span>,
 };
 
+<span class="doccomment">/// Error type describing failure modes for the `SessionKey` and</span>
+<span class="doccomment">/// `ExportedSessionKey` decoding.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Error</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SessionKeyDecodeError</span> {
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The session had a invalid version, expected {0}, got {1}&quot;</span>)]</span>
+    <span class="doccomment">/// The encoded session key had a unsupported version.</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The session key had a invalid version, expected {0}, got {1}&quot;</span>)]</span>
     <span class="ident">Version</span>(<span class="ident">u8</span>, <span class="ident">u8</span>),
+    <span class="doccomment">/// The encoded session key didn&#39;t contain enough data to be decoded.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The session key was too short {0}&quot;</span>)]</span>
     <span class="ident">Read</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">std::io::Error</span>),
+    <span class="doccomment">/// The encoded session key wasn&#39;t valid base64.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The session key wasn&#39;t valid base64: {0}&quot;</span>)]</span>
     <span class="ident">Base64</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">base64::DecodeError</span>),
+    <span class="doccomment">/// The signature on the session key was invalid.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The signature on the session key was invalid: {0}&quot;</span>)]</span>
     <span class="ident">Signature</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">SignatureError</span>),
+    <span class="doccomment">/// The encoded session key contains an invalid public key.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The public key of session was invalid: {0}&quot;</span>)]</span>
     <span class="ident">PublicKey</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident"><span class="kw">crate</span>::KeyError</span>),
 }
 
+<span class="doccomment">/// The exported session key.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This uses the same format as the `SessionKey` minus the signature at the</span>
+<span class="doccomment">/// end.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ExportedSessionKey</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">ratchet_index</span>: <span class="ident">u32</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">ratchet</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">128</span>]<span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">signing_key</span>: <span class="ident">Ed25519PublicKey</span>,
 }
 
+<span class="doccomment">/// The session key, can be used to create a [`InboundGroupSession`].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Uses the session-sharing format described in the [Olm spec].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// +---+----+--------+--------+--------+--------+------+-----------+</span>
+<span class="doccomment">/// | V | i  | R(i,0) | R(i,1) | R(i,2) | R(i,3) | Kpub | Signature |</span>
+<span class="doccomment">/// +---+----+--------+--------+--------+--------+------+-----------+</span>
+<span class="doccomment">/// 0   1    5        37       69      101      133    165         229   bytes</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The version byte, V, is &quot;\x02&quot;.</span>
+<span class="doccomment">/// This is followed by the ratchet index, iii, which is encoded as a</span>
+<span class="doccomment">/// big-endian 32-bit integer; the 128 bytes of the ratchet; and the public</span>
+<span class="doccomment">/// part of the Ed25519 keypair.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The data is then signed using the Ed25519 key, and the 64-byte signature is</span>
+<span class="doccomment">/// appended.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [`InboundGroupSession`]: #crate.megolm.InboundGroupSession</span>
+<span class="doccomment">/// [Olm spec]: https://gitlab.matrix.org/matrix-org/olm/blob/master/docs/megolm.md#session-sharing-format</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SessionKey</span> {
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">session_key</span>: <span class="ident">ExportedSessionKey</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">signature</span>: <span class="ident">Ed25519Signature</span>,
@@ -373,10 +449,6 @@
         <span class="self">Self</span> { <span class="ident">ratchet_index</span>, <span class="ident">ratchet</span>: <span class="ident">ratchet_bytes</span>, <span class="ident">signing_key</span> }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">to_bytes_with_version</span>(<span class="ident"><span class="self">Self</span>::VERSION</span>)
-    }
-
     <span class="kw">fn</span> <span class="ident">to_bytes_with_version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">version</span>: <span class="ident">u8</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ratchet_index</span>.<span class="ident">to_be_bytes</span>();
 
@@ -384,11 +456,22 @@
             .<span class="ident">concat</span>()
     }
 
+    <span class="doccomment">/// Serialize the `ExportedSessionKey` to a byte vector.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">to_bytes_with_version</span>(<span class="ident"><span class="self">Self</span>::VERSION</span>)
+    }
+
+    <span class="doccomment">/// Deserialize the `ExportedSessionKey` from a byte slice.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_bytes</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">SessionKeyDecodeError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">Cursor::new</span>(<span class="ident">bytes</span>);
         <span class="ident"><span class="self">Self</span>::decode_key</span>(<span class="ident"><span class="self">Self</span>::VERSION</span>, <span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>)
     }
 
+    <span class="doccomment">/// Serialize the `ExportedSessionKey` to a base64 encoded string.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This method will first use the [`ExportedSessionKey::to_bytes()`] to</span>
+    <span class="doccomment">/// convert the session key to a byte vector and then encode the byte vector</span>
+    <span class="doccomment">/// to a string using unpadded base64 as the encoding.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_base64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">to_bytes</span>();
 
@@ -399,6 +482,7 @@
         <span class="ident">ret</span>
     }
 
+    <span class="doccomment">/// Deserialize the `ExportedSessionKey` from base64 encoded string.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_base64</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">SessionKeyDecodeError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">base64_decode</span>(<span class="ident">key</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::from_bytes</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>);
@@ -447,10 +531,11 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_signature_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_signature_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">session_key</span>.<span class="ident">to_bytes_with_version</span>(<span class="ident"><span class="self">Self</span>::VERSION</span>)
     }
 
+    <span class="doccomment">/// Serialize the `SessionKey` to a byte vector.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">to_signature_bytes</span>();
         <span class="ident">bytes</span>.<span class="ident">extend</span>(<span class="self">self</span>.<span class="ident">signature</span>.<span class="ident">to_bytes</span>());
@@ -458,6 +543,7 @@
         <span class="ident">bytes</span>
     }
 
+    <span class="doccomment">/// Deserialize the `SessionKey` from a byte slice.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_bytes</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">SessionKeyDecodeError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">Cursor::new</span>(<span class="ident">bytes</span>);
         <span class="kw">let</span> <span class="ident">session_key</span> <span class="op">=</span> <span class="ident">ExportedSessionKey::decode_key</span>(<span class="ident"><span class="self">Self</span>::VERSION</span>, <span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>)<span class="question-mark">?</span>;
@@ -476,6 +562,11 @@
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> { <span class="ident">session_key</span>, <span class="ident">signature</span> })
     }
 
+    <span class="doccomment">/// Serialize the `SessionKey` to a base64 encoded string.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This method will first use the [`SessionKey::to_bytes()`] to</span>
+    <span class="doccomment">/// convert the session key to a byte vector and then encode the byte vector</span>
+    <span class="doccomment">/// to a string using unpadded base64 as the encoding.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_base64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">to_bytes</span>();
         <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">base64_encode</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>);
@@ -485,6 +576,7 @@
         <span class="ident">ret</span>
     }
 
+    <span class="doccomment">/// Deserialize the `SessionKey` from base64 encoded string.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_base64</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">SessionKeyDecodeError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">base64_decode</span>(<span class="ident">key</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::from_bytes</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>);
@@ -592,5 +684,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (082e4ca49 2022-04-26)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (cb1219871 2022-05-08)" ></div>
 </body></html>

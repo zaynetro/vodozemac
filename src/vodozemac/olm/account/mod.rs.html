@@ -886,6 +886,8 @@
 <span id="881">881</span>
 <span id="882">882</span>
 <span id="883">883</span>
+<span id="884">884</span>
+<span id="885">885</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Damir Jelić, Denis Kasak</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -927,21 +929,27 @@
         <span class="ident">Ed25519Keypair</span>, <span class="ident">Ed25519KeypairPickle</span>, <span class="ident">Ed25519PublicKey</span>, <span class="ident">KeyId</span>,
     },
     <span class="ident">utilities</span>::{<span class="ident">pickle</span>, <span class="ident">unpickle</span>, <span class="ident">DecodeSecret</span>},
-    <span class="ident">DecodeError</span>, <span class="ident">Ed25519Signature</span>, <span class="ident">PickleError</span>,
+    <span class="ident">Ed25519Signature</span>, <span class="ident">PickleError</span>,
 };
 
 <span class="kw">const</span> <span class="ident">PUBLIC_MAX_ONE_TIME_KEYS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">50</span>;
 
+<span class="doccomment">/// Error describing failure modes when creating a Olm Session from an incoming</span>
+<span class="doccomment">/// Olm message.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Error</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SessionCreationError</span> {
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The pre-key message wasn&#39;t valid base64: {0}&quot;</span>)]</span>
-    <span class="ident">Base64</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">base64::DecodeError</span>),
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The pre-key message couldn&#39;t be decoded: {0}&quot;</span>)]</span>
-    <span class="ident">DecodeError</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">DecodeError</span>),
+    <span class="doccomment">/// The pre-key message contained an unknown one-time key. This happens</span>
+    <span class="doccomment">/// either because we never had such a one-time key, or because it has</span>
+    <span class="doccomment">/// already been used up.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The pre-key message contained an unknown one-time key&quot;</span>)]</span>
     <span class="ident">MissingOneTimeKey</span>,
+    <span class="doccomment">/// The pre-key message contains a curve25519 identity key that doesn&#39;t</span>
+    <span class="doccomment">/// match to the identity key that was given.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The given identity key doesn&#39;t match the one in the pre-key message&quot;</span>)]</span>
     <span class="ident">MismatchedIdentityKey</span>,
+    <span class="doccomment">/// The pre-key message that was used to establish the Session couldn&#39;t be</span>
+    <span class="doccomment">/// decrypted. The message needs to be decryptable, otherwise we will have</span>
+    <span class="doccomment">/// created a Session that wasn&#39;t used to encrypt the pre-key message.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The message that was used to establish the Session couldn&#39;t be decrypted&quot;</span>)]</span>
     <span class="ident">Decryption</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">DecryptionError</span>),
 }
@@ -999,12 +1007,6 @@
     <span class="doccomment">/// Get a reference to the account&#39;s public Ed25519 key</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ed25519_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Ed25519PublicKey</span> {
         <span class="self">self</span>.<span class="ident">signing_key</span>.<span class="ident">public_key</span>()
-    }
-
-    <span class="doccomment">/// Get a reference to the account&#39;s public Ed25519 key as an unpadded</span>
-    <span class="doccomment">/// base64 encoded string.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ed25519_key_encoded</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">signing_key</span>.<span class="ident">public_key_encoded</span>()
     }
 
     <span class="doccomment">/// Get a reference to the account&#39;s public Curve25519 key</span>
@@ -1395,6 +1397,8 @@
     }
 }
 
+<span class="doccomment">/// A format suitable for serialization which implements [`serde::Serialize`]</span>
+<span class="doccomment">/// and [`serde::Deserialize`]. Obtainable by calling [`Account::pickle`].</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AccountPickle</span> {
     <span class="ident">signing_key</span>: <span class="ident">Ed25519KeypairPickle</span>,
@@ -1683,7 +1687,7 @@
 
         <span class="kw">let</span> <span class="ident">unpickled</span> <span class="op">=</span> <span class="ident">Account::from_libolm_pickle</span>(<span class="kw-2">&amp;</span><span class="ident">pickle</span>, <span class="ident">key</span>)<span class="question-mark">?</span>;
 
-        <span class="macro">assert_eq!</span>(<span class="ident">olm</span>.<span class="ident">parsed_identity_keys</span>().<span class="ident">ed25519</span>(), <span class="ident">unpickled</span>.<span class="ident">ed25519_key_encoded</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">olm</span>.<span class="ident">parsed_identity_keys</span>().<span class="ident">ed25519</span>(), <span class="ident">unpickled</span>.<span class="ident">ed25519_key</span>().<span class="ident">to_base64</span>());
         <span class="macro">assert_eq!</span>(<span class="ident">olm</span>.<span class="ident">parsed_identity_keys</span>().<span class="ident">curve25519</span>(), <span class="ident">unpickled</span>.<span class="ident">curve25519_key_encoded</span>());
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">olm_one_time_keys</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span>
@@ -1770,5 +1774,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (082e4ca49 2022-04-26)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (cb1219871 2022-05-08)" ></div>
 </body></html>

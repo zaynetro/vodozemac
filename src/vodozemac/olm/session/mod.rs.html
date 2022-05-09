@@ -665,6 +665,9 @@
 <span id="660">660</span>
 <span id="661">661</span>
 <span id="662">662</span>
+<span id="663">663</span>
+<span id="664">664</span>
+<span id="665">665</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Damir Jelić</span>
 <span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -709,10 +712,29 @@
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">olm::messages</span>::{<span class="ident">Message</span>, <span class="ident">OlmMessage</span>, <span class="ident">PreKeyMessage</span>},
     <span class="ident">utilities</span>::{<span class="ident">base64_encode</span>, <span class="ident">pickle</span>, <span class="ident">unpickle</span>, <span class="ident">DecodeSecret</span>},
-    <span class="ident">Curve25519PublicKey</span>, <span class="ident">DecodeError</span>, <span class="ident">PickleError</span>,
+    <span class="ident">Curve25519PublicKey</span>, <span class="ident">PickleError</span>,
 };
 
 <span class="kw">const</span> <span class="ident">MAX_RECEIVING_CHAINS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">5</span>;
+
+<span class="doccomment">/// Error type for Olm-based decryption failuers.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Error</span>, <span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DecryptionError</span> {
+    <span class="doccomment">/// The message authentication code of the message was invalid.</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Failed decrypting Olm message, invalid MAC: {0}&quot;</span>)]</span>
+    <span class="ident">InvalidMAC</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">MacError</span>),
+    <span class="doccomment">/// The ciphertext of the message isn&#39;t padded correctly.</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Failed decrypting Olm message, invalid padding&quot;</span>)]</span>
+    <span class="ident">InvalidPadding</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">UnpadError</span>),
+    <span class="doccomment">/// The session is missing the correct message key to decrypt the message,</span>
+    <span class="doccomment">/// either because it was already used up, or because the Session has been</span>
+    <span class="doccomment">/// ratcheted forwards and the message key has been discarded.</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The message key with the given key can&#39;t be created, message index: {0}&quot;</span>)]</span>
+    <span class="ident">MissingMessageKey</span>(<span class="ident">u64</span>),
+    <span class="doccomment">/// Too many messages have been skipped to attempt decrypting this message.</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The message gap was too big, got {0}, max allowed {}&quot;</span>)]</span>
+    <span class="ident">TooBigMessageGap</span>(<span class="ident">u64</span>, <span class="ident">u64</span>),
+}
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">struct</span> <span class="ident">ChainStore</span> {
@@ -749,22 +771,6 @@
     <span class="kw">fn</span> <span class="ident">find_ratchet</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ratchet_key</span>: <span class="kw-2">&amp;</span><span class="ident">RemoteRatchetKey</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">ReceiverChain</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">iter_mut</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">belongs_to</span>(<span class="ident">ratchet_key</span>))
     }
-}
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Error</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DecryptionError</span> {
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The message wasn&#39;t valid base64: {0}&quot;</span>)]</span>
-    <span class="ident">Base64</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">base64::DecodeError</span>),
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Failed decrypting Olm message, invalid MAC: {0}&quot;</span>)]</span>
-    <span class="ident">InvalidMAC</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">MacError</span>),
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Failed decrypting Olm message, invalid padding&quot;</span>)]</span>
-    <span class="ident">InvalidPadding</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">UnpadError</span>),
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The message key with the given key can&#39;t be created, message index: {0}&quot;</span>)]</span>
-    <span class="ident">MissingMessageKey</span>(<span class="ident">u64</span>),
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The message gap was too big, got {0}, max allowed {}&quot;</span>)]</span>
-    <span class="ident">TooBigMessageGap</span>(<span class="ident">u64</span>, <span class="ident">u64</span>),
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The message couldn&#39;t be decoded: {0}&quot;</span>)]</span>
-    <span class="ident">DecodeError</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">DecodeError</span>),
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">ChainStore</span> {
@@ -1328,5 +1334,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (082e4ca49 2022-04-26)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (cb1219871 2022-05-08)" ></div>
 </body></html>
