@@ -3,7 +3,9 @@
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../../../vodozemac/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../vodozemac/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../vodozemac/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
+                                <a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div>
+                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -870,24 +872,6 @@
 <span id="865">865</span>
 <span id="866">866</span>
 <span id="867">867</span>
-<span id="868">868</span>
-<span id="869">869</span>
-<span id="870">870</span>
-<span id="871">871</span>
-<span id="872">872</span>
-<span id="873">873</span>
-<span id="874">874</span>
-<span id="875">875</span>
-<span id="876">876</span>
-<span id="877">877</span>
-<span id="878">878</span>
-<span id="879">879</span>
-<span id="880">880</span>
-<span id="881">881</span>
-<span id="882">882</span>
-<span id="883">883</span>
-<span id="884">884</span>
-<span id="885">885</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Damir Jelić, Denis Kasak</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -1001,7 +985,7 @@
 
     <span class="doccomment">/// Get the IdentityKeys of this Account</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">identity_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">IdentityKeys</span> {
-        <span class="ident">IdentityKeys</span> { <span class="ident">ed25519</span>: <span class="self">self</span>.<span class="ident">ed25519_key</span>(), <span class="ident">curve25519</span>: <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">curve25519_key</span>() }
+        <span class="ident">IdentityKeys</span> { <span class="ident">ed25519</span>: <span class="self">self</span>.<span class="ident">ed25519_key</span>(), <span class="ident">curve25519</span>: <span class="self">self</span>.<span class="ident">curve25519_key</span>() }
     }
 
     <span class="doccomment">/// Get a reference to the account&#39;s public Ed25519 key</span>
@@ -1010,14 +994,8 @@
     }
 
     <span class="doccomment">/// Get a reference to the account&#39;s public Curve25519 key</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">curve25519_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Curve25519PublicKey</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">curve25519_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Curve25519PublicKey</span> {
         <span class="self">self</span>.<span class="ident">diffie_hellman_key</span>.<span class="ident">public_key</span>()
-    }
-
-    <span class="doccomment">/// Get a reference to the account&#39;s public Curve25519 key as an unpadded</span>
-    <span class="doccomment">/// base64-encoded string.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">curve25519_key_encoded</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">diffie_hellman_key</span>.<span class="ident">public_key_encoded</span>()
     }
 
     <span class="doccomment">/// Sign the given message using our Ed25519 fingerprint key.</span>
@@ -1063,7 +1041,7 @@
         );
 
         <span class="kw">let</span> <span class="ident">session_keys</span> <span class="op">=</span> <span class="ident">SessionKeys</span> {
-            <span class="ident">identity_key</span>: <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">curve25519_key</span>(),
+            <span class="ident">identity_key</span>: <span class="self">self</span>.<span class="ident">curve25519_key</span>(),
             <span class="ident">base_key</span>: <span class="ident">public_base_key</span>,
             <span class="ident">one_time_key</span>,
         };
@@ -1094,10 +1072,10 @@
     <span class="doccomment">/// Create a [`Session`] from the given pre-key message and identity key</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_inbound_session</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">their_identity_key</span>: <span class="kw-2">&amp;</span><span class="ident">Curve25519PublicKey</span>,
+        <span class="ident">their_identity_key</span>: <span class="ident">Curve25519PublicKey</span>,
         <span class="ident">pre_key_message</span>: <span class="kw-2">&amp;</span><span class="ident">PreKeyMessage</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">InboundCreationResult</span>, <span class="ident">SessionCreationError</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">their_identity_key</span> <span class="op">!</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">pre_key_message</span>.<span class="ident">identity_key</span>() {
+        <span class="kw">if</span> <span class="ident">their_identity_key</span> <span class="op">!</span><span class="op">=</span> <span class="ident">pre_key_message</span>.<span class="ident">identity_key</span>() {
             <span class="prelude-val">Err</span>(<span class="ident">SessionCreationError::MismatchedIdentityKey</span>)
         } <span class="kw">else</span> {
             <span class="comment">// Find the matching private key that the message claims to have</span>
@@ -1160,18 +1138,6 @@
             .<span class="ident">unpublished_public_keys</span>
             .<span class="ident">iter</span>()
             .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">key_id</span>, <span class="ident">key</span>)<span class="op">|</span> (<span class="kw-2">*</span><span class="ident">key_id</span>, <span class="kw-2">*</span><span class="ident">key</span>))
-            .<span class="ident">collect</span>()
-    }
-
-    <span class="doccomment">/// Get the currently unpublished one-time keys in base64-encoded form.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The one-time keys should be published to a server and marked as</span>
-    <span class="doccomment">/// published using the `mark_keys_as_published()` method.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">one_time_keys_encoded</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">one_time_keys</span>
-            .<span class="ident">unpublished_public_keys</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">key_id</span>, <span class="ident">key</span>)<span class="op">|</span> (<span class="ident">key_id</span>.<span class="ident">to_base64</span>(), <span class="ident">key</span>.<span class="ident">to_base64</span>()))
             .<span class="ident">collect</span>()
     }
 
@@ -1483,7 +1449,7 @@
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">LibolmOlmMessage::PreKey</span>(<span class="ident">m</span>) <span class="op">=</span> <span class="ident">olm_message</span>.<span class="ident">clone</span>() {
             <span class="kw">let</span> <span class="ident">libolm_session</span> <span class="op">=</span>
-                <span class="ident">bob</span>.<span class="ident">create_inbound_session_from</span>(<span class="ident">alice</span>.<span class="ident">curve25519_key_encoded</span>(), <span class="ident">m</span>)<span class="question-mark">?</span>;
+                <span class="ident">bob</span>.<span class="ident">create_inbound_session_from</span>(<span class="kw-2">&amp;</span><span class="ident">alice</span>.<span class="ident">curve25519_key</span>().<span class="ident">to_base64</span>(), <span class="ident">m</span>)<span class="question-mark">?</span>;
             <span class="macro">assert_eq!</span>(<span class="ident">alice_session</span>.<span class="ident">session_id</span>(), <span class="ident">libolm_session</span>.<span class="ident">session_id</span>());
 
             <span class="kw">let</span> <span class="ident">plaintext</span> <span class="op">=</span> <span class="ident">libolm_session</span>.<span class="ident">decrypt</span>(<span class="ident">olm_message</span>)<span class="question-mark">?</span>;
@@ -1527,7 +1493,7 @@
         <span class="ident">bob</span>.<span class="ident">generate_one_time_keys</span>(<span class="number">1</span>);
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">alice_session</span> <span class="op">=</span> <span class="ident">alice</span>.<span class="ident">create_outbound_session</span>(
-            <span class="kw-2">*</span><span class="ident">bob</span>.<span class="ident">curve25519_key</span>(),
+            <span class="ident">bob</span>.<span class="ident">curve25519_key</span>(),
             <span class="kw-2">*</span><span class="ident">bob</span>.<span class="ident">one_time_keys</span>()
                 .<span class="ident">iter</span>()
                 .<span class="ident">next</span>()
@@ -1584,15 +1550,13 @@
 
         <span class="ident">bob</span>.<span class="ident">generate_one_time_keys</span>(<span class="number">1</span>);
 
-        <span class="kw">let</span> <span class="ident">one_time_key</span> <span class="op">=</span> <span class="ident">bob</span>
-            .<span class="ident">one_time_keys_encoded</span>()
-            .<span class="ident">values</span>()
-            .<span class="ident">next</span>()
-            .<span class="ident">cloned</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;Didn&#39;t find a valid one-time key&quot;</span>);
+        <span class="kw">let</span> <span class="ident">one_time_key</span> <span class="op">=</span>
+            <span class="ident">bob</span>.<span class="ident">one_time_keys</span>().<span class="ident">values</span>().<span class="ident">next</span>().<span class="ident">cloned</span>().<span class="ident">expect</span>(<span class="string">&quot;Didn&#39;t find a valid one-time key&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">alice_session</span> <span class="op">=</span>
-            <span class="ident">alice</span>.<span class="ident">create_outbound_session</span>(<span class="ident">bob</span>.<span class="ident">curve25519_key_encoded</span>(), <span class="kw-2">&amp;</span><span class="ident">one_time_key</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">alice_session</span> <span class="op">=</span> <span class="ident">alice</span>.<span class="ident">create_outbound_session</span>(
+            <span class="kw-2">&amp;</span><span class="ident">bob</span>.<span class="ident">curve25519_key</span>().<span class="ident">to_base64</span>(),
+            <span class="kw-2">&amp;</span><span class="ident">one_time_key</span>.<span class="ident">to_base64</span>(),
+        )<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">text</span> <span class="op">=</span> <span class="string">&quot;It&#39;s a secret to everybody&quot;</span>;
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">alice_session</span>.<span class="ident">encrypt</span>(<span class="ident">text</span>).<span class="ident">into</span>();
@@ -1600,7 +1564,7 @@
         <span class="kw">let</span> <span class="ident">identity_key</span> <span class="op">=</span> <span class="ident">PublicKey::from_base64</span>(<span class="ident">alice</span>.<span class="ident">parsed_identity_keys</span>().<span class="ident">curve25519</span>())<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">InboundCreationResult</span> { <span class="ident">session</span>, <span class="ident">plaintext</span> } <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">OlmMessage::PreKey</span>(<span class="ident">m</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">message</span> {
-            <span class="ident">bob</span>.<span class="ident">create_inbound_session</span>(<span class="kw-2">&amp;</span><span class="ident">identity_key</span>, <span class="ident">m</span>)<span class="question-mark">?</span>
+            <span class="ident">bob</span>.<span class="ident">create_inbound_session</span>(<span class="ident">identity_key</span>, <span class="ident">m</span>)<span class="question-mark">?</span>
         } <span class="kw">else</span> {
             <span class="macro">bail!</span>(<span class="string">&quot;Got invalid message type from olm_rs {:?}&quot;</span>, <span class="ident">message</span>);
         };
@@ -1624,8 +1588,10 @@
             <span class="ident">bob</span>.<span class="ident">fallback_key</span>().<span class="ident">values</span>().<span class="ident">next</span>().<span class="ident">cloned</span>().<span class="ident">expect</span>(<span class="string">&quot;Didn&#39;t find a valid fallback key&quot;</span>);
         <span class="macro">assert!</span>(<span class="ident">bob</span>.<span class="ident">one_time_keys</span>.<span class="ident">private_keys</span>.<span class="ident">is_empty</span>());
 
-        <span class="kw">let</span> <span class="ident">alice_session</span> <span class="op">=</span> <span class="ident">alice</span>
-            .<span class="ident">create_outbound_session</span>(<span class="ident">bob</span>.<span class="ident">curve25519_key_encoded</span>(), <span class="kw-2">&amp;</span><span class="ident">one_time_key</span>.<span class="ident">to_base64</span>())<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">alice_session</span> <span class="op">=</span> <span class="ident">alice</span>.<span class="ident">create_outbound_session</span>(
+            <span class="kw-2">&amp;</span><span class="ident">bob</span>.<span class="ident">curve25519_key</span>().<span class="ident">to_base64</span>(),
+            <span class="kw-2">&amp;</span><span class="ident">one_time_key</span>.<span class="ident">to_base64</span>(),
+        )<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">text</span> <span class="op">=</span> <span class="string">&quot;It&#39;s a secret to everybody&quot;</span>;
 
@@ -1634,7 +1600,7 @@
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">OlmMessage::PreKey</span>(<span class="ident">m</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">message</span> {
             <span class="kw">let</span> <span class="ident">InboundCreationResult</span> { <span class="ident">session</span>, <span class="ident">plaintext</span> } <span class="op">=</span>
-                <span class="ident">bob</span>.<span class="ident">create_inbound_session</span>(<span class="kw-2">&amp;</span><span class="ident">identity_key</span>, <span class="ident">m</span>)<span class="question-mark">?</span>;
+                <span class="ident">bob</span>.<span class="ident">create_inbound_session</span>(<span class="ident">identity_key</span>, <span class="ident">m</span>)<span class="question-mark">?</span>;
 
             <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">session_keys</span>(), <span class="ident">session</span>.<span class="ident">session_keys</span>());
             <span class="macro">assert_eq!</span>(<span class="ident">alice_session</span>.<span class="ident">session_id</span>(), <span class="ident">session</span>.<span class="ident">session_id</span>());
@@ -1688,12 +1654,12 @@
         <span class="kw">let</span> <span class="ident">unpickled</span> <span class="op">=</span> <span class="ident">Account::from_libolm_pickle</span>(<span class="kw-2">&amp;</span><span class="ident">pickle</span>, <span class="ident">key</span>)<span class="question-mark">?</span>;
 
         <span class="macro">assert_eq!</span>(<span class="ident">olm</span>.<span class="ident">parsed_identity_keys</span>().<span class="ident">ed25519</span>(), <span class="ident">unpickled</span>.<span class="ident">ed25519_key</span>().<span class="ident">to_base64</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">olm</span>.<span class="ident">parsed_identity_keys</span>().<span class="ident">curve25519</span>(), <span class="ident">unpickled</span>.<span class="ident">curve25519_key_encoded</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">olm</span>.<span class="ident">parsed_identity_keys</span>().<span class="ident">curve25519</span>(), <span class="ident">unpickled</span>.<span class="ident">curve25519_key</span>().<span class="ident">to_base64</span>());
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">olm_one_time_keys</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span>
             <span class="ident">olm</span>.<span class="ident">parsed_one_time_keys</span>().<span class="ident">curve25519</span>().<span class="ident">values</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">k</span><span class="op">|</span> <span class="ident">k</span>.<span class="ident">to_owned</span>()).<span class="ident">collect</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">one_time_keys</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">unpickled</span>.<span class="ident">one_time_keys_encoded</span>().<span class="ident">values</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">k</span><span class="op">|</span> <span class="ident">k</span>.<span class="ident">to_owned</span>()).<span class="ident">collect</span>();
+            <span class="ident">unpickled</span>.<span class="ident">one_time_keys</span>().<span class="ident">values</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">k</span><span class="op">|</span> <span class="ident">k</span>.<span class="ident">to_base64</span>()).<span class="ident">collect</span>();
 
         <span class="ident">olm_one_time_keys</span>.<span class="ident">sort</span>();
         <span class="ident">one_time_keys</span>.<span class="ident">sort</span>();
@@ -1740,7 +1706,7 @@
         <span class="ident">alice</span>.<span class="ident">generate_one_time_keys</span>(<span class="number">1</span>);
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">malory</span>.<span class="ident">create_outbound_session</span>(
-            <span class="kw-2">*</span><span class="ident">alice</span>.<span class="ident">curve25519_key</span>(),
+            <span class="ident">alice</span>.<span class="ident">curve25519_key</span>(),
             <span class="kw-2">*</span><span class="ident">alice</span>.<span class="ident">one_time_keys</span>().<span class="ident">values</span>().<span class="ident">next</span>().<span class="ident">expect</span>(<span class="string">&quot;Should have one-time key&quot;</span>),
         );
 
@@ -1774,5 +1740,5 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (cb1219871 2022-05-08)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (c52b9c10b 2022-05-16)" ></div>
 </body></html>
