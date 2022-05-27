@@ -376,27 +376,6 @@
 <span id="369">369</span>
 <span id="370">370</span>
 <span id="371">371</span>
-<span id="372">372</span>
-<span id="373">373</span>
-<span id="374">374</span>
-<span id="375">375</span>
-<span id="376">376</span>
-<span id="377">377</span>
-<span id="378">378</span>
-<span id="379">379</span>
-<span id="380">380</span>
-<span id="381">381</span>
-<span id="382">382</span>
-<span id="383">383</span>
-<span id="384">384</span>
-<span id="385">385</span>
-<span id="386">386</span>
-<span id="387">387</span>
-<span id="388">388</span>
-<span id="389">389</span>
-<span id="390">390</span>
-<span id="391">391</span>
-<span id="392">392</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -428,7 +407,7 @@
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">cipher::Cipher</span>,
     <span class="ident">types</span>::{<span class="ident">Ed25519PublicKey</span>, <span class="ident">SignatureError</span>},
-    <span class="ident">utilities</span>::{<span class="ident">base64_encode</span>, <span class="ident">pickle</span>, <span class="ident">unpickle</span>, <span class="ident">DecodeSecret</span>},
+    <span class="ident">utilities</span>::{<span class="ident">base64_encode</span>, <span class="ident">pickle</span>, <span class="ident">unpickle</span>},
     <span class="ident">PickleError</span>,
 };
 
@@ -611,36 +590,15 @@
         <span class="ident">pickle</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">pickle_key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="kw">crate</span>::LibolmPickleError</span><span class="op">&gt;</span> {
+        <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::libolm::LibolmRatchetPickle</span>;
         <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utilities</span>::{<span class="ident">unpickle_libolm</span>, <span class="ident">Decode</span>};
-
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Zeroize</span>)]</span>
-        <span class="attribute">#[<span class="ident">zeroize</span>(<span class="ident">drop</span>)]</span>
-        <span class="kw">struct</span> <span class="ident">RatchetPickle</span> {
-            <span class="ident">ratchet</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">128</span>]<span class="op">&gt;</span>,
-            <span class="ident">index</span>: <span class="ident">u32</span>,
-        }
-
-        <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">RatchetPickle</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Ratchet</span> {
-            <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">pickle</span>: <span class="kw-2">&amp;</span><span class="ident">RatchetPickle</span>) -&gt; <span class="self">Self</span> {
-                <span class="ident">Ratchet::from_bytes</span>(<span class="ident">pickle</span>.<span class="ident">ratchet</span>.<span class="ident">clone</span>(), <span class="ident">pickle</span>.<span class="ident">index</span>)
-            }
-        }
-
-        <span class="kw">impl</span> <span class="ident">Decode</span> <span class="kw">for</span> <span class="ident">RatchetPickle</span> {
-            <span class="kw">fn</span> <span class="ident">decode</span>(<span class="ident">reader</span>: <span class="kw-2">&amp;mut</span> <span class="kw">impl</span> <span class="ident">Read</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="kw">crate</span>::utilities::LibolmDecodeError</span><span class="op">&gt;</span> {
-                <span class="prelude-val">Ok</span>(<span class="ident">RatchetPickle</span> {
-                    <span class="ident">ratchet</span>: <span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">128</span>]<span class="op">&gt;</span><span class="ident">::decode_secret</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>,
-                    <span class="ident">index</span>: <span class="ident">u32::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>,
-                })
-            }
-        }
 
         <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Zeroize</span>)]</span>
         <span class="attribute">#[<span class="ident">zeroize</span>(<span class="ident">drop</span>)]</span>
         <span class="kw">struct</span> <span class="ident">Pickle</span> {
             <span class="ident">version</span>: <span class="ident">u32</span>,
-            <span class="ident">initial_ratchet</span>: <span class="ident">RatchetPickle</span>,
-            <span class="ident">latest_ratchet</span>: <span class="ident">RatchetPickle</span>,
+            <span class="ident">initial_ratchet</span>: <span class="ident">LibolmRatchetPickle</span>,
+            <span class="ident">latest_ratchet</span>: <span class="ident">LibolmRatchetPickle</span>,
             <span class="ident">signing_key</span>: [<span class="ident">u8</span>; <span class="number">32</span>],
             <span class="ident">signing_key_verified</span>: <span class="ident">bool</span>,
         }
@@ -649,8 +607,8 @@
             <span class="kw">fn</span> <span class="ident">decode</span>(<span class="ident">reader</span>: <span class="kw-2">&amp;mut</span> <span class="kw">impl</span> <span class="ident">Read</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="kw">crate</span>::utilities::LibolmDecodeError</span><span class="op">&gt;</span> {
                 <span class="prelude-val">Ok</span>(<span class="ident">Pickle</span> {
                     <span class="ident">version</span>: <span class="ident">u32::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>,
-                    <span class="ident">initial_ratchet</span>: <span class="ident">RatchetPickle::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>,
-                    <span class="ident">latest_ratchet</span>: <span class="ident">RatchetPickle::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>,
+                    <span class="ident">initial_ratchet</span>: <span class="ident">LibolmRatchetPickle::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>,
+                    <span class="ident">latest_ratchet</span>: <span class="ident">LibolmRatchetPickle::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>,
                     <span class="ident">signing_key</span>: <span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span><span class="ident">::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>,
                     <span class="ident">signing_key_verified</span>: <span class="ident">bool::decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>,
                 })
@@ -790,5 +748,5 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (76761db59 2022-05-24)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="vodozemac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (490324f7b 2022-05-26)" ></div>
 </body></html>
